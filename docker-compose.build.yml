@@ -1,5 +1,9 @@
+# Use this if you want Plesk to build from source instead of pulling pre-built image
 services:
   krypto-dashboard-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: ghcr.io/kuranez/krypto-dashboard-web:latest
     user: "10000:1003"  # webadmin:psacln
     ports:
@@ -9,4 +13,3 @@ services:
       - PYTHONUNBUFFERED=1
       - BINANCE_API_KEY=${BINANCE_API_KEY:-}
     restart: unless-stopped
-
