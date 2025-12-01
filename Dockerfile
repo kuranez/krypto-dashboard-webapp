@@ -31,5 +31,5 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV BINANCE_API_KEY=${BINANCE_API_KEY:-}
 
-# Start the Panel app
-CMD ["panel", "serve", "app/main.py", "--address", "0.0.0.0", "--port", "5013", "--num-procs", "1", "--allow-websocket-origin=apps.kuracodez.space", "--use-xheaders", "--log-level=info", "--prefix", "/krypto-dashboard"]
+# Start the Panel app using launch.py
+CMD ["python", "app/launch.py"]
