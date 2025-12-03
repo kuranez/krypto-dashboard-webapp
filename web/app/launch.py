@@ -27,11 +27,11 @@ def main():
             import panel as pn
             print("🚀 Starting Cryptocurrency Dashboard (Docker mode)...")
             print("📊 Server running on port 5013")
-            print("🔗 Access at: http://0.0.0.0:5013/krypto-dashboard/")
+            print("🔗 Access at: http://0.0.0.0:5013/krypto-dashboard/app")
             print("⏹️  Press Ctrl+C to stop the server")
             
             pn.serve(
-                {'/krypto-dashboard': app},
+                {'/krypto-dashboard/app': app},
                 address='0.0.0.0',
                 port=5013,
                 allow_websocket_origin=['*'],  # Allow all origins (use reverse proxy for security)
