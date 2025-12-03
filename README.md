@@ -4,16 +4,26 @@
     <a href="https://www.python.org/" target="_blank">
         <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
     </a>
+    <a href="https://plotly.com" target="_blank">
+        <img src="https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white" alt=""Plotly/>
+    </a>
     <a href="https://panel.holoviz.org/" target="_blank">
         <img src="https://img.shields.io/badge/Holoviz%20Panel-0094A9?style=for-the-badge" alt="Holoviz Panel"/>
     </a>
     <a href="https://docs.docker.com/" target="_blank">
         <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
     </a>
+        <a href="https://www.plesk.com/" target="_blank">
+        <img src="https://img.shields.io/badge/Plesk-52B0E7?style=for-the-badge&logo=plesk&logoColor=white" alt="Plesk"/>
+    </a>
 </p>
 
 
-A modular, extensible cryptocurrency dashboard built with HoloViz Panel. Based on previous project: https://github.com/kuranez/krypto-dashboard
+A modular, extensible cryptocurrency dashboard built with HoloViz Panel. 
+
+Based on previous project: https://github.com/kuranez/krypto-dashboard
+
+- **Note:** Docker image optimized for Plesk server administration software.
 
 ## 🌐 Web App
 
