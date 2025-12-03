@@ -21,6 +21,12 @@ The Docker container now runs on port 5013 **without** a URL prefix. You need to
 2. Add to **Additional nginx directives**:
 
 ```nginx
+# Redirect /krypto-dashboard to /krypto-dashboard/
+location = /krypto-dashboard {
+    return 301 /krypto-dashboard/;
+}
+
+# Proxy all requests under /krypto-dashboard/ to the app
 location /krypto-dashboard/ {
     proxy_pass http://127.0.0.1:5013/;
     proxy_http_version 1.1;
