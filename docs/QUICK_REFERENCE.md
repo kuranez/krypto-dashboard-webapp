@@ -1,92 +1,72 @@
-# Quick Commands Reference
+# Quick Reference
 
-## GitHub Setup
+## Local Development
 
 ```bash
-# Initialize and push to GitHub
-git init
-git add .
-git commit -m "Initial commit: Cryptocurrency Dashboard Web"
-git remote add origin https://github.com/kuranez/krypto-dashboard-web.git
-git branch -M main
-git push -u origin main
+# Install dependencies
+pip install -r web/requirements.txt
+
+# Run locally
+python web/app/launch.py
+# Access at: http://localhost:5007
 ```
 
 ## Docker Commands
 
 ```bash
-# Build locally
-docker build -t krypto-dashboard-web .
+# Build
+docker-compose -f docker-compose.build.yml build
 
-# Run locally built image
-docker run -p 5013:5013 krypto-dashboard-web
+# Run locally
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop
+docker-compose down
+
+# Push to GHCR
+docker push ghcr.io/kuranez/krypto-dashboard-web:latest
 
 # Pull from GHCR
 docker pull ghcr.io/kuranez/krypto-dashboard-web:latest
-
-# Run from GHCR
-docker run -p 5013:5013 ghcr.io/kuranez/krypto-dashboard-web:latest
-
-# Run with API key
-docker run -p 5013:5013 -e BINANCE_API_KEY=your_key ghcr.io/kuranez/krypto-dashboard-web:latest
-
-# Use docker-compose
-docker-compose up -d
-docker-compose down
-docker-compose logs -f
-```
-
-## Development
-
-```bash
-# Install dependencies
-pip install -r web/app/requirements.txt
-
-# Run locally for development
-python launch.py
-
-# Run with Panel serve
-panel serve web/app/main.py --port 5013 --autoreload
 ```
 
 ## Git Workflow
 
 ```bash
-# Create feature branch
-git checkout -b feature/new-dashboard
-
-# Make changes, then commit
+# Make changes
 git add .
-git commit -m "Add: new dashboard feature"
+git commit -m "Description of changes"
+git push origin main
 
-# Push to GitHub
-git push origin feature/new-dashboard
-
-# Create pull request on GitHub
-```
-
-## Release Tagging
-
-```bash
-# Create and push tag
+# Create release tag
 git tag -a v1.0.0 -m "Release version 1.0.0"
 git push origin v1.0.0
-
-# This triggers multi-tagged Docker images:
-# - ghcr.io/kuranez/krypto-dashboard-web:1.0.0
-# - ghcr.io/kuranez/krypto-dashboard-web:1.0
-# - ghcr.io/kuranez/krypto-dashboard-web:1
-# - ghcr.io/kuranez/krypto-dashboard-web:latest
 ```
 
-## Accessing the App
+## Server Deployment
 
-- **Local Development**: http://localhost:5007
-- **Docker Container**: http://localhost:5013
-- **With Prefix**: http://localhost:5013/krypto-dashboard
+```bash
+# Pull latest code
+git pull origin main
+
+# Pull latest image
+docker-compose pull
+
+# Restart
+docker-compose down && docker-compose up -d
+```
+
+## Access URLs
+
+- **Local:** http://localhost:5007
+- **Docker:** http://localhost:5013/krypto-dashboard
+- **Production:** https://apps.kuracodez.space/krypto-dashboard
 
 ## Useful Links
 
-- Repository: https://github.com/kuranez/krypto-dashboard-web
-- Packages: https://github.com/kuranez?tab=packages
-- Actions: https://github.com/kuranez/krypto-dashboard-web/actions
+- **Repository:** https://github.com/kuranez/krypto-dashboard-web
+- **Packages:** https://github.com/kuranez?tab=packages
+- **Actions:** https://github.com/kuranez/krypto-dashboard-web/actions
