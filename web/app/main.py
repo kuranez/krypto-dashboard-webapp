@@ -145,10 +145,10 @@ def create_app():
     app = DashboardApp()
     return app.create_app()
 
+# Make the app servable for panel serve command
+app = create_app()
+app.servable()
+
 if __name__ == "__main__":
-    # Create and serve the app
-    app = create_app()
-    app.servable()
-    
-    # For development, you can also use:
-    # app.show(port=5007)
+    # For development, show the app
+    app.show(port=5007)
