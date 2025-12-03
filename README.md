@@ -12,44 +12,33 @@ A modular, extensible cryptocurrency dashboard built with HoloViz Panel.
 
 ## Quick Start
 
-### Using Docker (Recommended)
-
-1. **Pull and run from GitHub Container Registry**:
-   ```bash
-   docker run -p 5013:5013 ghcr.io/kuranez/krypto-dashboard-web:latest
-   ```
-
-2. **Or use Docker Compose**:
-   ```bash
-   docker-compose up
-   ```
-
-3. **With API key** (optional):
-   ```bash
-   docker run -p 5013:5013 -e BINANCE_API_KEY=your_key ghcr.io/kuranez/krypto-dashboard-web:latest
-   ```
-
-4. **Open Browser**: Navigate to http://localhost:5007
-
-### Local Installation
+### Local Development
 
 1. **Install Dependencies**:
    ```bash
-   pip install -r app/requirements.txt
+   pip install -r web/requirements.txt
    ```
 
-2. **Set up API Key** (optional):
-   Create a `keys.env` file in the project root:
-   ```
-   BINANCE_API_KEY=your_api_key_here
-   ```
-
-3. **Launch the App**:
+2. **Launch the App**:
    ```bash
-   python launch.py
+   python web/app/launch.py
    ```
 
-4. **Open Browser**: Navigate to http://localhost:5007
+3. **Open Browser**: Navigate to http://localhost:5007
+
+### Docker (Production)
+
+1. **Pull from GitHub Container Registry**:
+   ```bash
+   docker pull ghcr.io/kuranez/krypto-dashboard-web:latest
+   ```
+
+2. **Run with Docker Compose**:
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Access**: http://localhost:5013/krypto-dashboard
 
 ## Architecture
 
@@ -65,26 +54,22 @@ A modular, extensible cryptocurrency dashboard built with HoloViz Panel.
 ### Dashboard Structure
 
 ```
-app/
-├── main.py                 # Main application
-├── dashboard_registry.py   # Dashboard discovery
-├── base_dashboard.py      # Base dashboard class
-├── data_manager.py        # Data management
-├── figure_factory.py      # Chart creation
-├── config.py             # Configuration
-├── launch.py             # Launch script
-└── requirements.txt      # Dependencies
-
-dashboards/
-├── simple_price_dashboard.py  # Basic price and volume chart
-├── detailed_price_chart.py  # Detailed price and volume chart
-├── market_overview.py  # Market overview for major chains
-└── [your_dashboard].py         # Add your dashboards here
-
-krypto-dashboard/
-├── launch_simple.py                # ✅ Quick launcher for testing
-├── example_usage.py                # ✅ Example of modular usage
-└── test_simple.py                  # ✅ Working test script
+web/
+├── app/
+│   ├── main.py                    # Main application
+│   ├── launch.py                  # Local development launcher
+│   ├── dashboard_registry.py      # Dashboard discovery
+│   ├── base_dashboard.py         # Base dashboard class
+│   ├── data_manager.py           # Data management
+│   ├── figure_factory.py         # Chart creation
+│   ├── config.py                 # Configuration
+│   └── requirements.txt          # Dependencies
+├── dashboards/
+│   ├── simple_price_dashboard.py # Basic price chart
+│   ├── detailed_price_chart.py   # Detailed analysis
+│   └── market_overview.py        # Market overview
+└── assets/
+    └── logo.png                   # Application logo
 ```
 
 ## Creating New Dashboards
@@ -130,61 +115,73 @@ Edit `config.py` to customize:
 
 ## Deployment
 
-### Docker (Recommended)
+### Plesk Server (Production)
 
-**Pull from GitHub Container Registry:**
-```bash
-docker pull ghcr.io/kuranez/krypto-dashboard-web:latest
-docker run -p 5013:5013 ghcr.io/kuranez/krypto-dashboard-web:latest
-```
+1. **Configure Nginx Reverse Proxy** in Plesk:
+   ```nginx
+   location /krypto-dashboard/ {
+       proxy_pass http://localhost:5013/krypto-dashboard/;
+       proxy_http_version 1.1;
+       proxy_set_header Upgrade $http_upgrade;
+       proxy_set_header Connection "upgrade";
+       proxy_set_header Host $host;
+       proxy_set_header X-Real-IP $remote_addr;
+       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+       proxy_set_header X-Forwarded-Proto $scheme;
+   }
+   ```
+
+2. **Deploy Container**:
+   ```bash
+   # Pull latest code
+   git pull origin main
+   
+   # Pull latest image
+   docker-compose pull
+   
+   # Start/restart container
+   docker-compose down && docker-compose up -d
+   ```
+
+3. **Access**: https://apps.kuracodez.space/krypto-dashboard
+
+### Docker Build & Push
 
 **Build locally:**
 ```bash
-docker build -t krypto-dashboard-web .
-docker run -p 5013:5013 krypto-dashboard-web
+docker-compose -f docker-compose.build.yml build
 ```
 
-**Using Docker Compose:**
+**Push to GitHub Container Registry:**
 ```bash
-docker-compose up -d
-```
-
-**Building and pushing to ghcr.io:**
-```bash
-# Login to GitHub Container Registry
-echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
-
-# Build and tag
-docker build -t ghcr.io/kuranez/krypto-dashboard-web:latest .
-
-# Push to registry
 docker push ghcr.io/kuranez/krypto-dashboard-web:latest
 ```
 
-### Local Development
+### Environment Variables
+
+Optional API key configuration:
 ```bash
-python launch.py
+export BINANCE_API_KEY=your_api_key_here
 ```
 
-### Production with Panel Serve
-```bash
-panel serve app/main.py --port 5007 --allow-websocket-origin=*
-```
+Or set in Plesk Docker stack environment settings.
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Import Errors**: Make sure all dependencies are installed
-2. **API Errors**: Check your `keys.env` file and API key
-3. **Port Conflicts**: Change the port in `launch.py` if 5007 is in use
-4. **Data Loading**: Check your internet connection for API access
+1. **Import Errors**: Ensure dependencies installed: `pip install -r web/requirements.txt`
+2. **Port Conflicts**: Local dev uses port 5007, Docker uses 5013
+3. **404 Errors on Server**: Verify nginx reverse proxy configuration
+4. **WebSocket Errors**: Check `Upgrade` and `Connection` headers in proxy config
 
-### Development Tips
+For detailed troubleshooting and deployment guides, see the [docs/](docs/) directory.
 
-- Use `autoreload=True` in development for hot reloading
-- Check browser console for JavaScript errors
-- Use Panel's debugging features: `pn.config.console_output = 'accumulate'`
+## Documentation
+
+- **[DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Complete deployment guide
+- **[QUICK_REFERENCE.md](docs/QUICK_REFERENCE.md)** - Common commands
+- **[GITHUB_CONTAINER_REGISTRY.md](docs/GITHUB_CONTAINER_REGISTRY.md)** - Docker registry guide
 
 ## Contributing
 

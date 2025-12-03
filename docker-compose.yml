@@ -4,10 +4,9 @@ services:
     user: "10000:1003"  # webadmin:psacln
     ports:
       - "5013:5013"
-    env_file:
-      - keys.env
     environment:
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
+      - BINANCE_API_KEY=${BINANCE_API_KEY:-}
     restart: unless-stopped
 
