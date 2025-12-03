@@ -21,9 +21,13 @@ A modular, extensible cryptocurrency dashboard built with HoloViz Panel. Based o
 >
 > **Try the app - explore cryptocurrency prices directly in your browser.**
 
-## Screenshot
+## Screenshots
 
 > ![https://raw.githubusercontent.com/kuranez/krypto-dashboard-webapp/refs/heads/main/screenshots/Screenshot_market_overview.png](https://raw.githubusercontent.com/kuranez/krypto-dashboard-webapp/refs/heads/main/screenshots/Screenshot_market_overview.png)
+
+| **Simple Price Chart**                                                                                                                                                                                                                                              | **Detailed Price Chart**                                                                                                                                                                                                                                                |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![https://raw.githubusercontent.com/kuranez/krypto-dashboard-webapp/refs/heads/main/screenshots/Screenshot_simple_price_chart.png](https://raw.githubusercontent.com/kuranez/krypto-dashboard-webapp/refs/heads/main/screenshots/Screenshot_simple_price_chart.png) | ![https://raw.githubusercontent.com/kuranez/krypto-dashboard-webapp/refs/heads/main/screenshots/Screenshot_detailed_price_chart.png](https://raw.githubusercontent.com/kuranez/krypto-dashboard-webapp/refs/heads/main/screenshots/Screenshot_detailed_price_chart.png) |
 
 ## Features
 
@@ -199,12 +203,6 @@ Or set in Plesk Docker stack environment settings.
 4. **WebSocket Errors**: Check `Upgrade` and `Connection` headers in proxy config
 
 For detailed troubleshooting and deployment guides, see the [docs/](docs/) directory.
-
-## Documentation
-
-- **[DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Complete deployment guide
-- **[QUICK_REFERENCE.md](docs/QUICK_REFERENCE.md)** - Common commands
-- **[GITHUB_CONTAINER_REGISTRY.md](docs/GITHUB_CONTAINER_REGISTRY.md)** - Docker registry guide
 
 ## Contributing
 
