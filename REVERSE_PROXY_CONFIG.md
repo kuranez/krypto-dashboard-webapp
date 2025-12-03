@@ -5,12 +5,13 @@ The Docker container now runs on port 5013 **without** a URL prefix. You need to
 ## What Changed
 
 **Before (broken):**
-- App served at: `http://0.0.0.0:5013/krypto-dashboard`
-- Static files had 404 errors due to prefix issues
+- App served at root: `http://0.0.0.0:5013/`
+- Proxy tried to pass to `/krypto-dashboard/` 
+- Mismatch caused 404 errors
 
 **Now (working):**
-- App serves at: `http://0.0.0.0:5013/` (root)
-- Reverse proxy adds the `/krypto-dashboard` prefix
+- App serves at: `http://0.0.0.0:5013/krypto-dashboard/`
+- Reverse proxy passes to same path
 - All static files and websockets work correctly
 
 ## Nginx Configuration for Plesk
@@ -21,34 +22,21 @@ The Docker container now runs on port 5013 **without** a URL prefix. You need to
 2. Add to **Additional nginx directives**:
 
 ```nginx
-# Redirect /krypto-dashboard to /krypto-dashboard/
-location = /krypto-dashboard {
-    return 301 /krypto-dashboard/;
-}
-
-# Proxy all requests under /krypto-dashboard/ to the app
 location /krypto-dashboard/ {
-    proxy_pass http://127.0.0.1:5013/;
-    proxy_http_version 1.1;
-    
-    # WebSocket support
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
-    
-    # Standard proxy headers
+    proxy_pass http://127.0.0.1:5013/krypto-dashboard/;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
-    proxy_set_header X-Forwarded-Host $host;
-    proxy_set_header X-Forwarded-Port $server_port;
     
-    # Timeouts for long-running connections
-    proxy_connect_timeout 7d;
-    proxy_send_timeout 7d;
-    proxy_read_timeout 7d;
+    # WebSocket support
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
 }
 ```
+
+**Note:** This matches the pattern of your other apps (qr-code-generator, eu-energy-map, etc.).
 
 ### Option 2: Direct Nginx Config File
 
