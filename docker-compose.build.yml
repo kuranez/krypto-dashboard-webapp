@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     image: ghcr.io/kuranez/krypto-dashboard-web:latest
-    user: "10000:1003"  # webadmin:psacln
+    user: "10000:1003"  # webadmin:psacln for Plesk compatibility
     ports:
       - "5013:5013"
     environment:

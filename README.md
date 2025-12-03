@@ -1,6 +1,29 @@
 # Cryptocurrency Dashboard
 
-A modular, extensible cryptocurrency dashboard built with HoloViz Panel.
+<p align="left">
+    <a href="https://www.python.org/" target="_blank">
+        <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
+    </a>
+    <a href="https://panel.holoviz.org/" target="_blank">
+        <img src="https://img.shields.io/badge/Holoviz%20Panel-0094A9?style=for-the-badge" alt="Holoviz Panel"/>
+    </a>
+    <a href="https://docs.docker.com/" target="_blank">
+        <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
+    </a>
+</p>
+
+
+A modular, extensible cryptocurrency dashboard built with HoloViz Panel. Based on previous project: https://github.com/kuranez/krypto-dashboard
+
+## 🌐 Web App
+
+> [![Live Demo](https://img.shields.io/badge/🟢%20Live%20App-%20Krypto--Dashboard--0057B7?style=for-the-badge)](https://apps.kuracodez.space/krypto-dashboard/main)
+>
+> **Try the app - explore cryptocurrency prices directly in your browser.**
+
+## Screenshot
+
+> ![https://raw.githubusercontent.com/kuranez/krypto-dashboard-webapp/refs/heads/main/screenshots/Screenshot_market_overview.png](https://raw.githubusercontent.com/kuranez/krypto-dashboard-webapp/refs/heads/main/screenshots/Screenshot_market_overview.png)
 
 ## Features
 

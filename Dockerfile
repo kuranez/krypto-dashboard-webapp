@@ -20,7 +20,7 @@ COPY web/app ./app
 COPY web/assets ./assets
 COPY web/dashboards ./dashboards
 
-# Set permissions for the app files
+# Set permissions for the app files for Plesk compatibility
 RUN chown -R webadmin:psacln /app
 
 # Expose Panel port
