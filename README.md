@@ -204,6 +204,12 @@ Or set in Plesk Docker stack environment settings.
 
 For detailed troubleshooting and deployment guides, see the [docs/](docs/) directory.
 
+## Documentation
+
+- **[DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Complete deployment guide
+- **[QUICK_REFERENCE.md](docs/QUICK_REFERENCE.md)** - Common commands
+- **[GITHUB_CONTAINER_REGISTRY.md](docs/GITHUB_CONTAINER_REGISTRY.md)** - Docker registry guide
+
 ## Contributing
 
 1. Fork the repository
