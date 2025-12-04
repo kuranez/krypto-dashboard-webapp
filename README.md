@@ -27,7 +27,7 @@ Based on previous project: https://github.com/kuranez/krypto-dashboard
 
 ## 🌐 Web App
 
-> [![Live Demo](https://img.shields.io/badge/🟢%20Live%20App-%20Krypto--Dashboard--0057B7?style=for-the-badge)](https://apps.kuracodez.space/krypto-dashboard/main)
+> [![Live Demo](https://img.shields.io/badge/🟢%20Live%20App-%20Krypto--Dashboard-0057B7?style=for-the-badge)](https://apps.kuracodez.space/krypto-dashboard/main)
 >
 > **Try the app - explore cryptocurrency prices directly in your browser.**
 
