@@ -180,7 +180,7 @@ Edit `config.py` to customize:
    docker-compose down && docker-compose up -d
    ```
 
-3. **Access**: https://apps.kuracodez.space/krypto-dashboard
+3. **Access**: your.web.space/krypto-dashboard
 
 ### Docker Build & Push
 
