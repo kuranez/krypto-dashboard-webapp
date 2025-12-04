@@ -47,9 +47,9 @@ Based on previous project: https://github.com/kuranez/krypto-dashboard
 - 💾 **Data Caching**: Efficient API usage with Panel caching
 - 🔌 **Plugin System**: Auto-discovery of dashboard modules
 
-## Quick Start
+## 🎯 Quick Start
 
-### Local Development
+### 📦 Local Development
 
 1. **Install Dependencies**:
    ```bash
@@ -63,7 +63,7 @@ Based on previous project: https://github.com/kuranez/krypto-dashboard
 
 3. **Open Browser**: Navigate to http://localhost:5007
 
-### Docker (Production)
+### 🐋 Docker (Production)
 
 1. **Pull from GitHub Container Registry**:
    ```bash
@@ -77,7 +77,7 @@ Based on previous project: https://github.com/kuranez/krypto-dashboard
 
 3. **Access**: http://localhost:5013/krypto-dashboard
 
-## Architecture
+## ⚙️ Architecture
 
 ### Core Components
 
@@ -109,7 +109,7 @@ web/
     └── logo.png                   # Application logo
 ```
 
-## Creating New Dashboards
+## 💡 Creating New Dashboards
 
 ### Method 1: Inherit from BaseDashboard
 
@@ -135,7 +135,7 @@ class MyDashboard(BaseDashboard):
 
 Simply place any Python file with plotting functions in the `dashboards/` directory. The registry will automatically wrap it and make it available in the app.
 
-## Configuration
+## ⚙️ Configuration
 
 Edit `config.py` to customize:
 
@@ -144,13 +144,13 @@ Edit `config.py` to customize:
 - **API Settings**: Timeouts, retries, cache duration
 - **Time Intervals**: Available time period options
 
-## Data Sources
+## 📊 Data Sources
 
 - **Binance US API**: Real-time and historical cryptocurrency data
 - **Local CSV**: Fallback data sources
 - **Caching**: Automatic caching reduces API calls
 
-## Deployment
+## 🚀 Deployment
 
 ### Plesk Server (Production)
 
@@ -203,7 +203,7 @@ export BINANCE_API_KEY=your_api_key_here
 
 Or set in Plesk Docker stack environment settings.
 
-## Troubleshooting
+## 📕 Troubleshooting
 
 ### Common Issues
 
@@ -214,7 +214,7 @@ Or set in Plesk Docker stack environment settings.
 
 For detailed troubleshooting and deployment guides, see the [docs/](docs/) directory.
 
-## Contributing
+## 📗 Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -222,6 +222,6 @@ For detailed troubleshooting and deployment guides, see the [docs/](docs/) direc
 4. Test your dashboard
 5. Submit a pull request
 
-## License
+## 📘 License
 
 This project is open source and available under the MIT License. You may modify, distribute, and use it freely in your own projects.
