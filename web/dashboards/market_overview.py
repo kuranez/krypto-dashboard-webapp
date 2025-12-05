@@ -112,7 +112,7 @@ class MarketOverviewDashboard(BaseDashboard):
             ))
         
         fig.update_layout(
-            title_text="Cryptocurrency Market Overview: Current Price vs. All-Time High",
+            title_text="Current Price vs. All-Time High",
             xaxis_title="Price (USD)",
             barmode='overlay',
             xaxis_type='log',
@@ -158,7 +158,7 @@ class MarketOverviewDashboard(BaseDashboard):
             ))
         
         fig.update_layout(
-            title_text="Cryptocurrency Prices Over Time",
+            title_text="Price Comparison of Major Cryptocurrency Chains",
             xaxis_title="Date",
             yaxis_title="Price (USD)",
             yaxis_type="log",
@@ -166,11 +166,11 @@ class MarketOverviewDashboard(BaseDashboard):
             template=self.config.get_plotly_template(),
             showlegend=True,
             legend=dict(
-                orientation="h",
-                yanchor="top",
-                y=-0.15,
-                xanchor="center",
-                x=0.5
+            orientation="h",
+            yanchor="top",
+            y=-0.15,
+            xanchor="center",
+            x=0.5
             ),
             autosize=True,
             margin=dict(l=50, r=50, t=50, b=50)
