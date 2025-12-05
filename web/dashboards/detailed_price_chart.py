@@ -16,7 +16,7 @@ class DetailedPriceDashboard(BaseDashboard):
     
     display_name = "Detailed Price Chart"
     description = "Detailed price chart with SMA/EMA indicators and volume"
-    version = "2.0"
+    version = "2.1"
     author = "kuranez"
     
     def __init__(self):

@@ -14,7 +14,7 @@ class SimplePriceDashboard(BaseDashboard):
     
     display_name = "Simple Price Chart"
     description = "Basic price chart for a single cryptocurrency"
-    version = "2.1"
+    version = "2.2"
     author = "kuranez"
     
     def __init__(self):
