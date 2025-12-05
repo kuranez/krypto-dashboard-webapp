@@ -192,18 +192,21 @@ class MarketOverviewDashboard(BaseDashboard):
         )
         
         # Create reactive panes that can be updated
-        self.plot1_pane = pn.Column(sizing_mode='stretch_both', min_height=300)
-        self.plot2_pane = pn.Column(sizing_mode='stretch_both', min_height=700)
+        self.plot1_pane = pn.Column(sizing_mode='stretch_both', min_height=500)
+        self.plot2_pane = pn.Column(sizing_mode='stretch_both', min_height=500)
         
         # Initialize with current data
         self._update_display()
         
-        # Create layout with responsive design
+        # Create layout with responsive design - plots in a row (plot2 then plot1)
         layout = pn.Column(
             header,
             pn.layout.Divider(),
-            self.plot1_pane,
-            self.plot2_pane,
+            pn.Row(
+                self.plot2_pane,
+                self.plot1_pane,
+                sizing_mode='stretch_width'
+            ),
             sizing_mode='stretch_width',
             margin=(20, 20)
         )
