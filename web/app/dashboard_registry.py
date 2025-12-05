@@ -71,8 +71,8 @@ class DashboardRegistry:
         class DynamicDashboard(BaseDashboard):
             display_name = module_name.replace('_', ' ').title()
             description = f"Dashboard from {module_name}.py"
-            version = "1.0"
-            author = "Auto-generated"
+            version = "1.1"
+            author = "Auto-generated & modified by kuranez"
             
             def __init__(self):
                 super().__init__()

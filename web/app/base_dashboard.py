@@ -13,7 +13,7 @@ class BaseDashboard(ABC):
     # Class attributes that can be overridden by subclasses
     display_name: str = "Base Dashboard"
     description: str = "Base dashboard class"
-    version: str = "2.0"
+    version: str = "2.1"
     author: str = "kuranez"
     
     def __init__(self):
