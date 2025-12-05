@@ -60,17 +60,9 @@ class DetailedPriceDashboard(BaseDashboard):
             margin=(5, 10)
         )
         
-        self.widgets['refresh_button'] = pn.widgets.Button(
-            name='Refresh Data',
-            button_type='primary',
-            width=120,
-            margin=(5, 10)
-        )
-        
         # Bind events
         self.widgets['symbol_selector'].param.watch(self._on_symbol_change, 'value')
         self.widgets['period_selector'].param.watch(self._on_period_change, 'value')
-        self.widgets['refresh_button'].on_click(self._on_refresh_click)
     
     def _on_symbol_change(self, event):
         """Handle symbol change."""
@@ -106,7 +98,7 @@ class DetailedPriceDashboard(BaseDashboard):
         
         try:
             # Fetch historical data
-            df = self.data_manager.fetch_historical_data(symbol_usdt, limit=1000)
+            df = self.data_manager.fetch_historical_data(symbol=symbol_usdt, limit=1000)
             
             if not df.empty:
                 self.current_data = df
@@ -380,14 +372,13 @@ class DetailedPriceDashboard(BaseDashboard):
         controls = pn.Row(
             self.widgets['symbol_selector'],
             self.widgets['period_selector'],
-            self.widgets['refresh_button'],
             sizing_mode='stretch_width',
             margin=(10, 0)
         )
         
         # Create reactive panes that can be updated
-        self.chart_pane = pn.Column(min_height=700)
-        self.info_pane = pn.Column(sizing_mode='stretch_width')
+        self.chart_pane = pn.Column(sizing_mode='stretch_both', min_height=600)
+        self.info_pane = pn.Column(width=300, sizing_mode='fixed')
 
         # Initialize with current data
         self._update_display()
@@ -399,11 +390,9 @@ class DetailedPriceDashboard(BaseDashboard):
             controls,
             pn.layout.Divider(),
             pn.Row(
-            # Chart column - stretch to take all available space
-            pn.Column(self.chart_pane, sizing_mode='stretch_both'),
-            # Info column - keep small fixed/min width
-            pn.Column(self.info_pane, sizing_mode='fixed', width=300, min_width=200),
-            sizing_mode='stretch_width',
+                self.chart_pane,
+                self.info_pane,
+                sizing_mode='stretch_width'
             ),
             sizing_mode='stretch_width',
             margin=(20, 20)

@@ -67,18 +67,10 @@ class SimplePriceDashboard(BaseDashboard):
             margin=(5, 10)
         )
         
-        self.widgets['refresh_button'] = pn.widgets.Button(
-            name='Refresh Data',
-            button_type='primary',
-            width=120,
-            margin=(5, 10)
-        )
-        
         # Bind events
         self.widgets['symbol_selector'].param.watch(self._on_symbol_change, 'value')
         self.widgets['period_selector'].param.watch(self._on_period_change, 'value')
         self.widgets['chart_type'].param.watch(self._on_chart_type_change, 'value')
-        self.widgets['refresh_button'].on_click(self._on_refresh_click)
     
     def _on_symbol_change(self, event):
         """Handle symbol change."""
@@ -239,14 +231,13 @@ class SimplePriceDashboard(BaseDashboard):
             self.widgets['symbol_selector'],
             self.widgets['period_selector'],
             self.widgets['chart_type'],
-            self.widgets['refresh_button'],
             # sizing_mode='stretch_width',
             margin=(10, 0)
         )
         
         # Create reactive panes that can be updated
-        self.chart_pane = pn.Column(sizing_mode='stretch_both', min_height=400)
-        self.info_pane = pn.Column(sizing_mode='stretch_width', min_width=250)
+        self.chart_pane = pn.Column(sizing_mode='stretch_both', min_height=500)
+        self.info_pane = pn.Column(width=300, sizing_mode='fixed')
 
         # Initialize with current data
         self._update_display()
@@ -258,8 +249,8 @@ class SimplePriceDashboard(BaseDashboard):
             controls,
             pn.layout.Divider(),
             pn.Row(
-                pn.Column(self.chart_pane, sizing_mode='stretch_both'),
-                pn.Column(self.info_pane, sizing_mode='fixed', width=300, min_width=250),
+                self.chart_pane,
+                self.info_pane,
                 sizing_mode='stretch_width'
             ),
             sizing_mode='stretch_width',

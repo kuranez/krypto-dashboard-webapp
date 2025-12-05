@@ -7,9 +7,10 @@ class AppConfig:
     """Application configuration and styling."""
     
     def __init__(self):
+        
         # Color scheme
         self.accent_color = "teal"
-        self.primary_color = "#2E8B57"
+        self.primary_color = "#47356A"
         self.secondary_color = "#20B2AA"
         
         # Component styling
@@ -20,8 +21,8 @@ class AppConfig:
         }
         
         # Layout settings
-        self.sidebar_width = 280
-        self.plot_height = 500
+        # self.sidebar_width = 280
+        # self.plot_height = 500
         
         # Cryptocurrency colors for consistency
         self.crypto_colors = {

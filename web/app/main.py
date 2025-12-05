@@ -25,41 +25,65 @@ class DashboardApp(param.Parameterized):
         # Discover available dashboards
         self.registry.discover_dashboards()
         
-        # Create UI components - main area must be created before sidebar
-        # because sidebar initialization loads the first dashboard
+        # Create UI components
         self._create_main_area()
-        self._create_sidebar()
+        self._create_header()
         
-    def _create_sidebar(self):
-        """Create the sidebar with dashboard selection."""
+        # Load initial dashboard
+        dashboard_names = list(self.registry.get_available_dashboards().keys())
+        if dashboard_names:
+            self._load_dashboard(dashboard_names[0])
+        
+    def _create_header(self):
+        """Create the header with logo and dashboard selector."""
         dashboard_names = list(self.registry.get_available_dashboards().keys())
         
+        # Title
+        title_pane = pn.pane.Markdown(
+            "Select a Dashboard",
+            styles={'color': 'white', 'margin': '0px'},
+            margin=(10, 20)
+        )
+        
+        # Dashboard selector with white text
         self.dashboard_selector = pn.widgets.Select(
-            name='Select Dashboard',
+            name='',
             options=dashboard_names,
             value=dashboard_names[0] if dashboard_names else None,
-            width=250
+            width=300,
+            margin=(5, 10),
+            styles={'color': '#47356A'}
+        )
+        
+        # Load Data button
+        self.load_data_button = pn.widgets.Button(
+            name='Load Data',
+            button_type='primary',
+            width=120,
+            margin=(5, 10),
+            styles={'color': 'white'}
         )
         
         self.dashboard_selector.param.watch(self._on_dashboard_change, 'value')
+        self.load_data_button.on_click(self._on_load_data_click)
         
-        # Dashboard info panel
-        self.info_panel = pn.pane.Markdown(
-            "Select a dashboard to get started.",
-            width=250,
-            styles=self.config.styles
+        # Create header row without logo (logo is in template)
+        self.header_row = pn.Row(
+            title_pane,
+            pn.Spacer(),
+            self.dashboard_selector,
+            self.load_data_button,
+            sizing_mode='stretch_width',
+            styles={'background': self.config.primary_color, 'padding': '10px'},
+            height=70
         )
-        
-        # Load initial dashboard
-        if dashboard_names:
-            self._load_dashboard(dashboard_names[0])
     
     def _create_main_area(self):
         """Create the main content area."""
         # Use a Column so we can update it reactively
         self.main_content = pn.Column(
             pn.pane.Markdown(
-                "## Welcome to Crypto Dashboard\nSelect a dashboard from the sidebar.",
+                "## Welcome to Crypto Dashboard\nSelect a dashboard from the menu above.",
                 margin=(20, 20),
             ),
             sizing_mode='stretch_both'
@@ -70,6 +94,11 @@ class DashboardApp(param.Parameterized):
         if event.new:
             self._load_dashboard(event.new)
     
+    def _on_load_data_click(self, event):
+        """Handle load data button click."""
+        if self.current_dashboard_instance and hasattr(self.current_dashboard_instance, 'refresh_data'):
+            self.current_dashboard_instance.refresh_data()
+    
     def _load_dashboard(self, dashboard_name):
         """Load and display the selected dashboard."""
         try:
@@ -77,15 +106,6 @@ class DashboardApp(param.Parameterized):
             if dashboard_class:
                 # Create new dashboard instance
                 self.current_dashboard_instance = dashboard_class()
-                
-                # Update info panel
-                self.info_panel.object = f"""
-                ## {dashboard_name}
-                
-                **Description:** {getattr(dashboard_class, 'description', 'No description available')}
-                
-                **Version:** {getattr(dashboard_class, 'version', '1.0')}
-                """
                 
                 # Update main content with error handling
                 try:
@@ -110,28 +130,13 @@ class DashboardApp(param.Parameterized):
             self.main_content.clear()
             self.main_content.append(error_pane)
     
-    def create_app(self):
+    def create_template(self):
         """Create and return the Panel application."""
-        project_root = Path(__file__).resolve().parent.parent
-        local_logo = project_root / 'assets' / 'logo.png'
-        if local_logo.exists():
-            logo_pane = pn.pane.PNG(str(local_logo), width=250, margin=(10, 10), align='center')
-        else:
-            # Use server-relative path for deployments (expects the web server to serve /assets/logo.png)
-            logo_pane = pn.pane.PNG('/assets/logo.png', width=250, margin=(10, 10), align='center')
-
-        sidebar_content = [
-            logo_pane,
-            pn.Spacer(height=20),
-            self.dashboard_selector,
-            pn.Spacer(height=20),
-            self.info_panel
-        ]
-        
+        # Use FastListTemplate for proper title display
         template = pn.template.FastListTemplate(
-            title="Cryptocurrency Dashboard Hub",
-            sidebar=sidebar_content,
-            main=[self.main_content],
+            title="Cryptocurrency Dashboard",
+            logo=str(Path(__file__).resolve().parent.parent / 'assets' / 'logo.png'),
+            main=[self.header_row, self.main_content],
             main_layout=None,
             accent=self.config.accent_color,
             header_background=self.config.accent_color,
@@ -143,7 +148,7 @@ class DashboardApp(param.Parameterized):
 def create_app():
     """Factory function to create the dashboard app."""
     app = DashboardApp()
-    return app.create_app()
+    return app.create_template()
 
 # Make the app servable for panel serve command
 app = create_app()

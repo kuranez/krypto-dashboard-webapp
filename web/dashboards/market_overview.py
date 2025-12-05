@@ -38,15 +38,7 @@ class MarketOverviewDashboard(BaseDashboard):
     
     def _create_widgets(self):
         """Create the control widgets."""
-        self.widgets['refresh_button'] = pn.widgets.Button(
-            name='🔄 Refresh Data',
-            button_type='primary',
-            width=150,
-            margin=(5, 10)
-        )
-        
-        # Bind events
-        self.widgets['refresh_button'].on_click(self._on_refresh_click)
+        pass
     
     def _on_refresh_click(self, event):
         """Handle refresh button click."""
@@ -199,13 +191,6 @@ class MarketOverviewDashboard(BaseDashboard):
             }
         )
         
-        # Controls row
-        controls = pn.Row(
-            self.widgets['refresh_button'],
-            sizing_mode='stretch_width',
-            margin=(10, 0)
-        )
-        
         # Create reactive panes that can be updated
         self.plot1_pane = pn.Column(sizing_mode='stretch_both', min_height=300)
         self.plot2_pane = pn.Column(sizing_mode='stretch_both', min_height=500)
@@ -216,8 +201,6 @@ class MarketOverviewDashboard(BaseDashboard):
         # Create layout with responsive design
         layout = pn.Column(
             header,
-            pn.layout.Divider(),
-            controls,
             pn.layout.Divider(),
             self.plot1_pane,
             self.plot2_pane,
