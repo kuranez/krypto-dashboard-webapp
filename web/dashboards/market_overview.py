@@ -77,7 +77,7 @@ class MarketOverviewDashboard(BaseDashboard):
     def _create_current_vs_ath_plot(self):
         """Plot the current price vs All-Time High."""
         if not self.all_data:
-            return pn.pane.Markdown("## No data available\n\nClick **🔄 Refresh Data** to load market data.")
+            return pn.pane.Markdown("## No data available\n\nClick **Load Data** to load market data.")
         
         fig = go.Figure()
         
@@ -134,7 +134,7 @@ class MarketOverviewDashboard(BaseDashboard):
     def _create_price_comparison_plot(self):
         """Plot the price curves over time for all symbols."""
         if not self.all_data:
-            return pn.pane.Markdown("## No data available\n\nClick **🔄 Refresh Data** to load market data.")
+            return pn.pane.Markdown("## No data available\n\nClick **Load Data** to load market data.")
         
         fig = go.Figure()
         
@@ -193,7 +193,7 @@ class MarketOverviewDashboard(BaseDashboard):
         
         # Create reactive panes that can be updated
         self.plot1_pane = pn.Column(sizing_mode='stretch_both', min_height=300)
-        self.plot2_pane = pn.Column(sizing_mode='stretch_both', min_height=500)
+        self.plot2_pane = pn.Column(sizing_mode='stretch_both', min_height=700)
         
         # Initialize with current data
         self._update_display()

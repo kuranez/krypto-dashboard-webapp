@@ -377,7 +377,7 @@ class DetailedPriceDashboard(BaseDashboard):
         )
         
         # Create reactive panes that can be updated
-        self.chart_pane = pn.Column(sizing_mode='stretch_both', min_height=600)
+        self.chart_pane = pn.Column(sizing_mode='stretch_both', min_height=800)
         self.info_pane = pn.Column(width=300, sizing_mode='fixed')
 
         # Initialize with current data
