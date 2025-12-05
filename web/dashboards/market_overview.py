@@ -54,8 +54,8 @@ class MarketOverviewDashboard(BaseDashboard):
         
         try:
             for symbol, symbol_usdt in zip(self.symbols, self.symbols_usdt):
-                # Fetch historical data
-                df = self.data_manager.fetch_historical_data(symbol_usdt, limit=1000)
+                # Fetch historical data (hourly for more data points)
+                df = self.data_manager.fetch_historical_data(symbol_usdt, interval='1h', limit=1000)
                 
                 if not df.empty:
                     # Add symbol column

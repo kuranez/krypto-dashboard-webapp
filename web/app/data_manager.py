@@ -41,10 +41,10 @@ class DataManager:
     @pn.cache
     def fetch_historical_data(self, 
                              symbol: str = 'BTCUSDT', 
-                             interval: str = '1d', 
+                             interval: str = '1h',  # Changed from '1d' to '1h' for more data points
                              start_time: Optional[int] = None, 
                              end_time: Optional[int] = None, 
-                             limit: int = 1000) -> pd.DataFrame:
+                             limit: int = 1000) -> pd.DataFrame:  # Binance max is 1000
         """Fetch historical data for a given symbol from Binance API."""
         
         params = {

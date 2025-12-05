@@ -111,8 +111,8 @@ class SimplePriceDashboard(BaseDashboard):
         symbol_usdt = f"{self.current_symbol}USDT"
         
         try:
-            # Fetch historical data
-            df = self.data_manager.fetch_historical_data(symbol=symbol_usdt, limit=1000)
+            # Fetch historical data (hourly for more data points)
+            df = self.data_manager.fetch_historical_data(symbol=symbol_usdt, interval='1h', limit=1000)
             
             if not df.empty:
                 self.current_data = df
