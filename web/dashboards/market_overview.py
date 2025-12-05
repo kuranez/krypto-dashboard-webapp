@@ -16,7 +16,7 @@ class MarketOverviewDashboard(BaseDashboard):
     
     display_name = "Market Overview"
     description = "Market overview with current vs ATH and price comparison"
-    version = "2.1"
+    version = "2.2"
     author = "kuranez"
     
     def __init__(self):
