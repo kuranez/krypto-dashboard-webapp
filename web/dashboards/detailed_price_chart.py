@@ -270,7 +270,6 @@ class DetailedPriceDashboard(BaseDashboard):
         # Update layout
         fig.update_layout(
             template=self.config.get_plotly_template(),
-            height=700,
             hovermode='x unified',
             showlegend=True,
             legend=dict(
@@ -284,13 +283,15 @@ class DetailedPriceDashboard(BaseDashboard):
             yaxis_title="Price (USD)",
             yaxis2_title="Volume",
             xaxis_rangeslider_visible=True,
+            autosize=True,
+            margin=dict(l=50, r=50, t=80, b=50)
         )
         
         # Update axes
         fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128, 128, 128, 0.2)')
         fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128, 128, 128, 0.2)')
         
-        return pn.pane.Plotly(fig, sizing_mode='stretch_width')
+        return pn.pane.Plotly(fig, sizing_mode='stretch_both')
     
     def _create_info_panel(self):
         """Create an information panel with current stats and indicators."""
@@ -385,7 +386,7 @@ class DetailedPriceDashboard(BaseDashboard):
         )
         
         # Create reactive panes that can be updated
-        self.chart_pane = pn.Column(sizing_mode='stretch_width', min_height=500)
+        self.chart_pane = pn.Column(min_height=700)
         self.info_pane = pn.Column(sizing_mode='stretch_width')
 
         # Initialize with current data

@@ -125,7 +125,6 @@ class MarketOverviewDashboard(BaseDashboard):
             barmode='overlay',
             xaxis_type='log',
             template=self.config.get_plotly_template(),
-            height=400,
             showlegend=True,
             legend=dict(
                 orientation="v",
@@ -133,10 +132,12 @@ class MarketOverviewDashboard(BaseDashboard):
                 y=1,
                 xanchor="left",
                 x=1.02
-            )
+            ),
+            autosize=True,
+            margin=dict(l=50, r=150, t=50, b=50)
         )
         
-        return pn.pane.Plotly(fig, sizing_mode='stretch_width')
+        return pn.pane.Plotly(fig, sizing_mode='stretch_both')
     
     def _create_price_comparison_plot(self):
         """Plot the price curves over time for all symbols."""
@@ -171,7 +172,6 @@ class MarketOverviewDashboard(BaseDashboard):
             yaxis_type="log",
             xaxis_rangeslider_visible=True,
             template=self.config.get_plotly_template(),
-            height=700,
             showlegend=True,
             legend=dict(
                 orientation="h",
@@ -179,10 +179,12 @@ class MarketOverviewDashboard(BaseDashboard):
                 y=-0.15,
                 xanchor="center",
                 x=0.5
-            )
+            ),
+            autosize=True,
+            margin=dict(l=50, r=50, t=50, b=50)
         )
         
-        return pn.pane.Plotly(fig, sizing_mode='stretch_width')
+        return pn.pane.Plotly(fig, sizing_mode='stretch_both')
     
     def create_dashboard(self) -> pn.Column:
         """Create and return the dashboard layout."""
@@ -205,8 +207,8 @@ class MarketOverviewDashboard(BaseDashboard):
         )
         
         # Create reactive panes that can be updated
-        self.plot1_pane = pn.Column(sizing_mode='stretch_width', min_height=400)
-        self.plot2_pane = pn.Column(sizing_mode='stretch_width', min_height=700)
+        self.plot1_pane = pn.Column(sizing_mode='stretch_both', min_height=300)
+        self.plot2_pane = pn.Column(sizing_mode='stretch_both', min_height=500)
         
         # Initialize with current data
         self._update_display()

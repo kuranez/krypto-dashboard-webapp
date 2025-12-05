@@ -168,8 +168,9 @@ class SimplePriceDashboard(BaseDashboard):
                 xaxis_title="Date",
                 yaxis_title="Price (USD)",
                 template=self.config.get_plotly_template(),
-                height=500,
-                xaxis_rangeslider_visible=True
+                xaxis_rangeslider_visible=True,
+                autosize=True,
+                margin=dict(l=50, r=50, t=50, b=50)
             )
         elif self.current_chart_type == 'Volume':
             fig = go.Figure(data=[go.Bar(
@@ -182,10 +183,11 @@ class SimplePriceDashboard(BaseDashboard):
                 xaxis_title="Date",
                 yaxis_title="Volume",
                 template=self.config.get_plotly_template(),
-                height=500
+                autosize=True,
+                margin=dict(l=50, r=50, t=50, b=50)
             )
         
-        return pn.pane.Plotly(fig, sizing_mode='stretch_width')
+        return pn.pane.Plotly(fig, sizing_mode='stretch_both')
     
     def _create_info_panel(self):
         """Create an information panel with current stats."""
@@ -238,12 +240,12 @@ class SimplePriceDashboard(BaseDashboard):
             self.widgets['period_selector'],
             self.widgets['chart_type'],
             self.widgets['refresh_button'],
-            sizing_mode='stretch_width',
+            # sizing_mode='stretch_width',
             margin=(10, 0)
         )
         
         # Create reactive panes that can be updated
-        self.chart_pane = pn.Column(sizing_mode='stretch_width', min_height=500)
+        self.chart_pane = pn.Column(sizing_mode='stretch_both', min_height=400)
         self.info_pane = pn.Column(sizing_mode='stretch_width', min_width=250)
 
         # Initialize with current data

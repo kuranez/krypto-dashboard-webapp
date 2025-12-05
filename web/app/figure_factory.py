@@ -64,7 +64,6 @@ class FigureFactory:
             xaxis_title="Date",
             yaxis_title="Price (USD)",
             template=self.config.get_plotly_template(),
-            height=500,
             showlegend=False,
             yaxis=dict(
                 range=[price_min - price_range * 0.1, price_max + price_range * 0.1]
@@ -72,7 +71,9 @@ class FigureFactory:
             xaxis=dict(
                 rangeslider=dict(visible=True, thickness=0.05),
                 type='date'
-            )
+            ),
+            autosize=True,
+            margin=dict(l=50, r=50, t=50, b=50)
         )
         
         return fig

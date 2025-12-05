@@ -112,7 +112,7 @@ class DashboardRegistry:
                     func_list = "\\n".join([f"- {name}" for name, _ in self.plot_functions])
                     components.append(pn.pane.Markdown(f"**Available plotting functions:**\\n{func_list}"))
                 
-                return pn.Column(*components, sizing_mode="stretch_width")
+                return pn.Column(*components, sizing_mode="stretch_both")
         
         return DynamicDashboard
     
