@@ -106,7 +106,7 @@ class DetailedPriceDashboard(BaseDashboard):
         
         try:
             # Fetch historical data
-            df = self.data_manager.fetch_historical_data(symbol=symbol_usdt, limit=1000)
+            df = self.data_manager.fetch_historical_data(symbol_usdt, limit=1000)
             
             if not df.empty:
                 self.current_data = df
