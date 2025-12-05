@@ -94,14 +94,18 @@ class DashboardRegistry:
                 # If the module has a main function, try to extract plots from it
                 if hasattr(self.module, 'main'):
                     try:
-                        # This is a simplified approach - in practice you'd want
-                        # more sophisticated extraction of plotting logic
-                        components.append(pn.pane.Markdown(
-                            "This dashboard contains plotting functions from the original module. "
-                            "To fully integrate, the module should be refactored to use the BaseDashboard class."
-                        ))
+                        self.module.main()
                     except Exception as e:
                         components.append(pn.pane.Markdown(f"Error executing main: {e}"))
+                
+                # Execute and capture plotting functions
+                for func_name, func in self.plot_functions:
+                    try:
+                        result = func()
+                        if result is not None:
+                            components.append(result)
+                    except Exception as e:
+                        components.append(pn.pane.Markdown(f"Error in {func_name}: {e}"))
                 
                 # Show available functions
                 if self.plot_functions:
