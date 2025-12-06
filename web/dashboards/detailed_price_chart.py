@@ -251,7 +251,7 @@ class DetailedPriceDashboard(BaseDashboard):
         
         # Prepare volume data - aggregate by week/month for larger time periods
         # Determine aggregation period based on selected time period
-        if self.current_period in ['2Y', '3Y', '5Y', 'ALL']:
+        if self.current_period in ['2Y', '3Y', '5Y', 'All_Time']:
             # For very long periods (2Y+), aggregate by month
             df_copy = df.copy()
             df_copy['Month'] = df_copy['Date'].dt.to_period('M').apply(lambda r: r.start_time)
