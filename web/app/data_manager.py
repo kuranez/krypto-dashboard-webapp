@@ -247,6 +247,43 @@ class DataManager:
         """Deprecated: Use add_technical_indicators() instead."""
         return self.add_technical_indicators(df)
     
+    def filter_outliers_percentiles(self, df: pd.DataFrame, column_name: str, 
+                                   lower_percentile: float = 0.01, 
+                                   upper_percentile: float = 99.99) -> pd.DataFrame:
+        """Filter outliers from a DataFrame column using percentile-based bounds.
+        
+        This method removes extreme outliers by filtering values outside the specified
+        percentile range. Useful for cleaning data before visualization or analysis.
+        
+        Args:
+            df: DataFrame to filter
+            column_name: Name of the column to filter on
+            lower_percentile: Lower percentile threshold (default: 0.01 = bottom 0.01%)
+            upper_percentile: Upper percentile threshold (default: 99.99 = top 99.99%)
+        
+        Returns:
+            Filtered DataFrame with outliers removed
+            
+        Example:
+            # Remove extreme volume outliers
+            clean_df = data_manager.filter_outliers_percentiles(df, 'Volume', 1.0, 99.0)
+        """
+        if df.empty or column_name not in df.columns:
+            return df
+        
+        lower_bound = df[column_name].quantile(lower_percentile / 100)
+        upper_bound = df[column_name].quantile(upper_percentile / 100)
+        
+        filtered_df = df[(df[column_name] >= lower_bound) & (df[column_name] <= upper_bound)].copy()
+        
+        # Log filtering results
+        removed_count = len(df) - len(filtered_df)
+        if removed_count > 0:
+            print(f"Filtered {removed_count} outliers from '{column_name}' "
+                  f"(bounds: {lower_bound:.2f} - {upper_bound:.2f})")
+        
+        return filtered_df
+    
     def filter_by_time_interval(self, df: pd.DataFrame, interval: str) -> pd.DataFrame:
         """Filter DataFrame by time interval."""
         if df.empty or interval == 'All_Time':
