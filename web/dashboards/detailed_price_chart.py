@@ -305,6 +305,7 @@ class DetailedPriceDashboard(BaseDashboard):
         
         # Get statistics and indicator values from data manager
         period_stats = self.data_manager.calculate_period_stats(filtered_data)
+        all_time_stats = self.data_manager.calculate_all_time_stats(self.current_data)
         indicators = self.data_manager.get_indicator_values(filtered_data)
         
         # Format the information
@@ -318,6 +319,10 @@ class DetailedPriceDashboard(BaseDashboard):
 **Period High:** ${period_stats['period_high']:,.2f}
 
 **Period Low:** ${period_stats['period_low']:,.2f}
+
+**All-Time High:** ${all_time_stats['ath']:,.2f}
+
+**All-Time Low:** ${all_time_stats['atl']:,.2f}
 
 **Avg Volume:** {period_stats['avg_volume']:,.0f}
 
