@@ -16,7 +16,7 @@ class MarketOverviewDashboard(BaseDashboard):
     
     display_name = "Market Overview"
     description = "Market overview with current vs ATH and price comparison"
-    version = "2.2"
+    version = "2.3"
     author = "kuranez"
     
     def __init__(self):
@@ -54,8 +54,8 @@ class MarketOverviewDashboard(BaseDashboard):
         
         try:
             for symbol, symbol_usdt in zip(self.symbols, self.symbols_usdt):
-                # Fetch historical data (hourly for more data points)
-                df = self.data_manager.fetch_historical_data(symbol_usdt, interval='1h', limit=1000)
+                # Fetch combined data (hourly + daily + weekly for comprehensive coverage)
+                df = self.data_manager.fetch_combined_data(symbol_usdt)
                 
                 if not df.empty:
                     # Add symbol column

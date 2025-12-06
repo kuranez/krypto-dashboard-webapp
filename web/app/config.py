@@ -90,14 +90,16 @@ class AppConfig:
         
         # Default time intervals
         self.time_intervals = {
-            'All_Time': [None, None],
-            '5Y': 5*365,
-            '1Y': 365,
-            '6M': 180,
-            '3M': 90,
-            '1M': 30,
-            '2W': 14,
-            '1W': 7,
+            'All_Time': {'days': 'max', 'interval': 'daily'},
+            '5Y': {'days': 5*365, 'interval': 'daily'},
+            '3Y': {'days': 3*365, 'interval': 'daily'},
+            '2Y': {'days': 2*365, 'interval': 'daily'},
+            '1Y': {'days': 365, 'interval': 'hourly'},
+            '6M': {'days': 180, 'interval': 'hourly'},
+            '3M': {'days': 90, 'interval': 'hourly'},
+            '1M': {'days': 30, 'interval': 'hourly'},
+            '2W': {'days': 14, 'interval': 'hourly'},
+            '1W': {'days': 7, 'interval': 'hourly'},
         }
         
         # API settings

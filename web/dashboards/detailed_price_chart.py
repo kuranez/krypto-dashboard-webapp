@@ -16,7 +16,7 @@ class DetailedPriceDashboard(BaseDashboard):
     
     display_name = "Detailed Price Chart"
     description = "Detailed price chart with SMA/EMA indicators and volume"
-    version = "2.2"
+    version = "2.3"
     author = "kuranez"
     
     def __init__(self):
@@ -31,7 +31,7 @@ class DetailedPriceDashboard(BaseDashboard):
         
         # Available options
         self.available_symbols = ['BTC', 'ETH', 'BNB', 'TRX', 'SOL', 'ADA', 'DOT', 'UNI', 'XRP', 'XLM', 'LINK', 'LTC', 'DOGE', 'SHIB', 'HBAR']
-        self.available_periods = ['1W', '1M', '3M', '6M', '1Y', 'All_Time']
+        self.available_periods = list(self.config.time_intervals.keys())
         
         # Data storage
         self.current_data = None
@@ -97,8 +97,8 @@ class DetailedPriceDashboard(BaseDashboard):
         symbol_usdt = f"{self.current_symbol}USDT"
         
         try:
-            # Fetch historical data (hourly for more data points)
-            df = self.data_manager.fetch_historical_data(symbol=symbol_usdt, interval='1h', limit=1000)
+            # Fetch combined data (hourly + daily for comprehensive coverage)
+            df = self.data_manager.fetch_combined_data(symbol=symbol_usdt)
             
             if not df.empty:
                 self.current_data = df

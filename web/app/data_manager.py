@@ -123,6 +123,108 @@ class DataManager:
             print(f"Error fetching current price for {symbol}: {e}")
             return 0.0
     
+    def fetch_smart_data(self, symbol: str, time_period: str = '1Y') -> pd.DataFrame:
+        """Fetch historical data with smart interval selection based on time period.
+        
+        Uses different intervals based on time period:
+        - Short periods (< 6M): hourly data (1h)
+        - Medium periods (6M-3Y): daily data (1d)
+        - Long periods (5Y, All_Time): weekly data (1w)
+        
+        Args:
+            symbol: Trading pair symbol (e.g., 'BTCUSDT')
+            time_period: Time period from config (e.g., '1W', '1M', '1Y', '5Y', 'All_Time')
+        
+        Returns:
+            DataFrame with historical price data
+        """
+        period_config = self.config.time_intervals.get(time_period, {})
+        days = period_config.get('days', 365)
+        
+        # For All_Time or very long periods (5Y+), use weekly data
+        if days == 'max' or days >= 5*365:
+            # Use weekly data (1w interval gives ~1000 weeks ~ 19 years)
+            df = self.fetch_historical_data(symbol=symbol, interval='1w', limit=1000)
+            return df
+        
+        # For long periods (1Y - 3Y), use daily data
+        elif days > 180:
+            # Use daily data
+            limit = min(days, 1000)
+            df = self.fetch_historical_data(symbol=symbol, interval='1d', limit=limit)
+            return df
+        
+        # For short periods (< 6M), use hourly data
+        else:
+            # Use hourly data (up to 1000 hours ~ 41 days)
+            df = self.fetch_historical_data(symbol=symbol, interval='1h', limit=1000)
+            return df
+    
+    def fetch_combined_data(self, symbol: str) -> pd.DataFrame:
+        """Fetch multi-timeframe data and combine them intelligently.
+        
+        Fetches three timeframes for comprehensive coverage:
+        - Weekly data: 1000 weeks (~19 years) for long-term history
+        - Daily data: 1000 days (~2.7 years) for medium-term
+        - Hourly data: 1000 hours (~41 days) for recent high-resolution
+        
+        Combines them without overlap for optimal chart performance.
+        
+        Args:
+            symbol: Trading pair symbol (e.g., 'BTCUSDT')
+        
+        Returns:
+            DataFrame with combined historical price data across all timeframes
+        """
+        try:
+            # Fetch hourly data for recent period (1000 hours ~ 41 days)
+            df_hourly = self.fetch_historical_data(symbol=symbol, interval='1h', limit=1000)
+            
+            # Fetch daily data for medium-term history (1000 days ~ 2.7 years)
+            df_daily = self.fetch_historical_data(symbol=symbol, interval='1d', limit=1000)
+            
+            # Fetch weekly data for long-term history (1000 weeks ~ 19 years)
+            df_weekly = self.fetch_historical_data(symbol=symbol, interval='1w', limit=1000)
+            
+            # Handle empty data cases
+            if df_hourly.empty and df_daily.empty and df_weekly.empty:
+                return pd.DataFrame()
+            
+            # Start with weekly data as the base
+            combined = df_weekly.copy() if not df_weekly.empty else pd.DataFrame()
+            
+            # Add daily data (excluding overlap with hourly)
+            if not df_daily.empty:
+                if not df_hourly.empty:
+                    hourly_start = df_hourly['Date'].min()
+                    df_daily_filtered = df_daily[df_daily['Date'] < hourly_start].copy()
+                else:
+                    df_daily_filtered = df_daily.copy()
+                
+                # Remove daily data that overlaps with weekly
+                if not combined.empty:
+                    daily_start = df_daily_filtered['Date'].min()
+                    combined = combined[combined['Date'] < daily_start].copy()
+                
+                if not df_daily_filtered.empty:
+                    combined = pd.concat([combined, df_daily_filtered], ignore_index=True)
+            
+            # Add hourly data (most recent, no overlap)
+            if not df_hourly.empty:
+                combined = pd.concat([combined, df_hourly], ignore_index=True)
+            
+            # Sort and clean
+            if not combined.empty:
+                combined = combined.sort_values('Date').reset_index(drop=True)
+                # Remove any duplicate dates (keep last which is more granular)
+                combined = combined.drop_duplicates(subset=['Date'], keep='last').reset_index(drop=True)
+            
+            return combined
+                
+        except Exception as e:
+            print(f"Error fetching combined data for {symbol}: {e}")
+            return pd.DataFrame()
+    
     def add_technical_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         """Add technical indicators (SMAs and EMAs) to the DataFrame.
         
@@ -150,8 +252,12 @@ class DataManager:
         if df.empty or interval == 'All_Time':
             return df
         
-        days = self.config.time_intervals.get(interval)
-        if not days:
+        interval_config = self.config.time_intervals.get(interval)
+        if not interval_config:
+            return df
+        
+        days = interval_config.get('days')
+        if not days or days == 'max':
             return df
         
         cutoff_date = datetime.now() - timedelta(days=days)
