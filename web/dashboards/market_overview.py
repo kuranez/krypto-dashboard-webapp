@@ -74,13 +74,48 @@ class MarketOverviewDashboard(BaseDashboard):
         rgba = mcolors.to_rgba(color_name, opacity)
         return f'rgba({int(rgba[0]*255)}, {int(rgba[1]*255)}, {int(rgba[2]*255)}, {rgba[3]})'
     
-    def _create_current_vs_ath_plot(self):
-        """Plot the current price vs All-Time High."""
+    def _create_combined_plot(self):
+        """Create combined plot with price comparison and current vs ATH using shared legend."""
         if not self.all_data:
             return pn.pane.Markdown("## No data available\n\nClick **Load Data** to load market data.")
         
-        fig = go.Figure()
+        from plotly.subplots import make_subplots
         
+        # Create subplots: 1 row, 2 columns (side by side)
+        fig = make_subplots(
+            rows=1, cols=2,
+            column_widths=[0.55, 0.45],
+            subplot_titles=("Price Comparison of Major Cryptocurrency Chains", "Current Price vs. All-Time High"),
+            horizontal_spacing=0.08,
+            specs=[[{"type": "scatter"}, {"type": "bar"}]]
+        )
+        
+        # Column 1: Price comparison plot
+        for symbol in self.symbols:
+            if symbol not in self.all_data:
+                continue
+                
+            df_symbol = self.all_data[symbol]
+            current_price = self.current_price_dict[symbol]
+            ath = self.ath_dict[symbol]
+            color_a = self.config.get_crypto_color(symbol, 'primary')
+            color_b = self.config.get_crypto_color(symbol, 'secondary')
+            
+            # Add price line with current and ATH in legend
+            fig.add_trace(go.Scatter(
+                x=df_symbol['Date'],
+                y=df_symbol['Close'],
+                mode='lines',
+                name=f'{symbol} - Current: ${current_price:,.2f} | ATH: ${ath:,.2f}',
+                legendgroup=symbol,
+                line=dict(color=self._convert_color(color_a, 0.8)),
+                fill='tozeroy',
+                fillcolor=self._convert_color(color_b, 0.6),
+                hovertemplate=f'{symbol}<br>Date: %{{x}}<br>Close: $ %{{y:,.2f}}<extra></extra>',
+                showlegend=True
+            ), row=1, col=1)
+        
+        # Column 2: Current vs ATH plot
         for symbol in self.symbols:
             if symbol not in self.all_data:
                 continue
@@ -91,31 +126,38 @@ class MarketOverviewDashboard(BaseDashboard):
             ath = self.ath_dict[symbol]
             current = self.current_price_dict[symbol]
             
-            # ATH bar
+            # ATH bar (hidden from legend)
             fig.add_trace(go.Bar(
-                name=f'{symbol} All-Time-High: $ {ath:,.2f}',
+                name=f'{symbol} ATH',
                 y=[symbol],
                 x=[ath],
+                legendgroup=symbol,
                 marker_color=self._convert_color(color_b, 0.6),
                 orientation='h',
-                hovertemplate=f'{symbol}<br>All-Time-High: $ %{{x:,.2f}}<extra></extra>'
-            ))
+                hovertemplate=f'{symbol}<br>All-Time-High: $ %{{x:,.2f}}<extra></extra>',
+                showlegend=False
+            ), row=1, col=2)
             
-            # Current price bar
+            # Current price bar (hidden from legend)
             fig.add_trace(go.Bar(
-                name=f'{symbol} Current Price: $ {current:,.2f}',
+                name=f'{symbol} Current',
                 y=[symbol],
                 x=[current],
+                legendgroup=symbol,
                 marker_color=self._convert_color(color_a, 0.8),
                 orientation='h',
-                hovertemplate=f'{symbol}<br>Latest Price: $ %{{x:,.2f}}<extra></extra>'
-            ))
+                hovertemplate=f'{symbol}<br>Latest Price: $ %{{x:,.2f}}<extra></extra>',
+                showlegend=False
+            ), row=1, col=2)
+        
+        # Update layout
+        fig.update_xaxes(title_text="Date", row=1, col=1, rangeslider_visible=True)
+        fig.update_yaxes(title_text="Price (USD)", type="log", row=1, col=1)
+        fig.update_xaxes(title_text="Price (USD)", type="log", row=1, col=2)
+        fig.update_yaxes(title_text="", row=1, col=2)
         
         fig.update_layout(
-            title_text="Current Price vs. All-Time High",
-            xaxis_title="Price (USD)",
             barmode='overlay',
-            xaxis_type='log',
             template=self.config.get_plotly_template(),
             showlegend=True,
             legend=dict(
@@ -123,57 +165,14 @@ class MarketOverviewDashboard(BaseDashboard):
                 yanchor="top",
                 y=1,
                 xanchor="left",
-                x=1.02
+                x=1.02,
+                bgcolor="rgba(255,255,255,0.9)",
+                bordercolor="rgba(0,0,0,0.2)",
+                borderwidth=1
             ),
             autosize=True,
-            margin=dict(l=50, r=150, t=50, b=50)
-        )
-        
-        return pn.pane.Plotly(fig, sizing_mode='stretch_both')
-    
-    def _create_price_comparison_plot(self):
-        """Plot the price curves over time for all symbols."""
-        if not self.all_data:
-            return pn.pane.Markdown("## No data available\n\nClick **Load Data** to load market data.")
-        
-        fig = go.Figure()
-        
-        for symbol in self.symbols:
-            if symbol not in self.all_data:
-                continue
-                
-            df_symbol = self.all_data[symbol]
-            color_a = self.config.get_crypto_color(symbol, 'primary')
-            color_b = self.config.get_crypto_color(symbol, 'secondary')
-            
-            fig.add_trace(go.Scatter(
-                x=df_symbol['Date'],
-                y=df_symbol['Close'],
-                mode='lines',
-                name=f'{symbol} Close',
-                line=dict(color=self._convert_color(color_a, 0.8)),
-                fill='tozeroy',
-                fillcolor=self._convert_color(color_b, 0.6),
-                hovertemplate=f'{symbol}<br>Date: %{{x}}<br>Close: $ %{{y:,.2f}}<extra></extra>'
-            ))
-        
-        fig.update_layout(
-            title_text="Price Comparison of Major Cryptocurrency Chains",
-            xaxis_title="Date",
-            yaxis_title="Price (USD)",
-            yaxis_type="log",
-            xaxis_rangeslider_visible=True,
-            template=self.config.get_plotly_template(),
-            showlegend=True,
-            legend=dict(
-            orientation="h",
-            yanchor="top",
-            y=-0.15,
-            xanchor="center",
-            x=0.5
-            ),
-            autosize=True,
-            margin=dict(l=50, r=50, t=50, b=50)
+            height=600,
+            margin=dict(l=50, r=250, t=80, b=50)
         )
         
         return pn.pane.Plotly(fig, sizing_mode='stretch_both')
@@ -191,22 +190,17 @@ class MarketOverviewDashboard(BaseDashboard):
             }
         )
         
-        # Create reactive panes that can be updated
-        self.plot1_pane = pn.Column(sizing_mode='stretch_both', min_height=500)
-        self.plot2_pane = pn.Column(sizing_mode='stretch_both', min_height=500)
+        # Create reactive pane for combined plot
+        self.plot_pane = pn.Column(sizing_mode='stretch_both', min_height=600)
         
         # Initialize with current data
         self._update_display()
         
-        # Create layout with responsive design - plots in a row (plot2 then plot1)
+        # Create layout with responsive design - single combined plot
         layout = pn.Column(
             header,
             pn.layout.Divider(),
-            pn.Row(
-                self.plot2_pane,
-                self.plot1_pane,
-                sizing_mode='stretch_width'
-            ),
+            self.plot_pane,
             sizing_mode='stretch_width',
             margin=(20, 20)
         )
@@ -214,19 +208,15 @@ class MarketOverviewDashboard(BaseDashboard):
         return layout
     
     def _update_display(self):
-        """Update the plot panels."""
-        # Clear and update plot 1
-        self.plot1_pane.clear()
-        self.plot1_pane.append(self._create_current_vs_ath_plot())
-        
-        # Clear and update plot 2
-        self.plot2_pane.clear()
-        self.plot2_pane.append(self._create_price_comparison_plot())
+        """Update the plot panel."""
+        # Clear and update combined plot
+        self.plot_pane.clear()
+        self.plot_pane.append(self._create_combined_plot())
     
     def refresh_data(self):
         """Refresh the dashboard data."""
         self._load_data()
-        if hasattr(self, 'plot1_pane'):
+        if hasattr(self, 'plot_pane'):
             self._update_display()
     
     def get_dependencies(self) -> list:

@@ -186,8 +186,23 @@ class SimplePriceDashboard(BaseDashboard):
         if self.current_data is None or self.current_data.empty:
             return pn.pane.Markdown("No statistics available")
         
+        # Filter data by current period
+        filtered_data = self.data_manager.filter_by_time_interval(
+            self.current_data, 
+            self.current_period
+        )
+        
         # Get all-time statistics from data manager
         stats = self.data_manager.calculate_all_time_stats(self.current_data)
+        
+        # Get period statistics if filtered data is available
+        if not filtered_data.empty:
+            period_stats = self.data_manager.calculate_period_stats(filtered_data)
+            period_high = period_stats['period_high']
+            period_low = period_stats['period_low']
+        else:
+            period_high = stats['ath']
+            period_low = stats['atl']
         
         # Format the information
         info_text = f"""
@@ -196,6 +211,10 @@ class SimplePriceDashboard(BaseDashboard):
         **Current Price:** ${stats['current_price']:,.2f}
         
         **24h Change:** {stats['price_change_24h']:+.2f}%
+        
+        **Period High:** ${period_high:,.2f}
+        
+        **Period Low:** ${period_low:,.2f}
         
         **All-Time High:** ${stats['ath']:,.2f}
         
