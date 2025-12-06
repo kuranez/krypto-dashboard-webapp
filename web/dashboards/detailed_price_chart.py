@@ -101,6 +101,11 @@ class DetailedPriceDashboard(BaseDashboard):
             df = self.data_manager.fetch_combined_data(symbol=symbol_usdt)
             
             if not df.empty:
+                # Filter outliers from price and volume data
+                df = self.data_manager.filter_outliers_percentiles(df, 'Volume', 1.0, 99.0)
+                df = self.data_manager.filter_outliers_percentiles(df, 'High', 0.5, 99.5)
+                df = self.data_manager.filter_outliers_percentiles(df, 'Low', 0.5, 99.5)
+                df = self.data_manager.filter_outliers_percentiles(df, 'Close', 0.5, 99.5)
                 self.current_data = df
             else:
                 self.current_data = None

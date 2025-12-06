@@ -72,6 +72,11 @@ class MarketOverviewDashboard(BaseDashboard):
             # First, load BTC data as reference
             df_btc = self.data_manager.fetch_combined_data('BTCUSDT')
             if not df_btc.empty:
+                # Filter outliers from price and volume data
+                df_btc = self.data_manager.filter_outliers_percentiles(df_btc, 'Volume', 1.0, 99.0)
+                df_btc = self.data_manager.filter_outliers_percentiles(df_btc, 'High', 0.5, 99.5)
+                df_btc = self.data_manager.filter_outliers_percentiles(df_btc, 'Low', 0.5, 99.5)
+                df_btc = self.data_manager.filter_outliers_percentiles(df_btc, 'Close', 0.5, 99.5)
                 df_btc['Symbol'] = 'BTC'
                 self.all_data['BTC'] = df_btc
                 self.ath_dict['BTC'] = df_btc['High'].max()
@@ -101,6 +106,11 @@ class MarketOverviewDashboard(BaseDashboard):
                 df = self.data_manager.fetch_combined_data(symbol_usdt)
                 
                 if not df.empty:
+                    # Filter outliers from price and volume data
+                    df = self.data_manager.filter_outliers_percentiles(df, 'Volume', 1.0, 99.0)
+                    df = self.data_manager.filter_outliers_percentiles(df, 'High', 0.5, 99.5)
+                    df = self.data_manager.filter_outliers_percentiles(df, 'Low', 0.5, 99.5)
+                    df = self.data_manager.filter_outliers_percentiles(df, 'Close', 0.5, 99.5)
                     # Add symbol column
                     df['Symbol'] = symbol
                     self.all_data[symbol] = df
