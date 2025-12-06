@@ -299,59 +299,50 @@ class DetailedPriceDashboard(BaseDashboard):
         if filtered_data.empty:
             return pn.pane.Markdown("No data available")
         
-        # Calculate statistics
-        latest_price = filtered_data['Close'].iloc[-1]
-        price_change = (
-            (filtered_data['Close'].iloc[-1] - filtered_data['Close'].iloc[0]) 
-            / filtered_data['Close'].iloc[0] * 100
-        ) if len(filtered_data) > 1 else 0
+        # Add technical indicators to DataFrame if not present
+        if 'SMA_50' not in filtered_data.columns:
+            filtered_data = self.data_manager.add_technical_indicators(filtered_data)
         
-        high_price = filtered_data['High'].max()
-        low_price = filtered_data['Low'].min()
-        avg_volume = filtered_data['Volume'].mean()
-        
-        # Calculate moving averages
-        sma_50 = filtered_data['Close'].rolling(window=50).mean().iloc[-1] if len(filtered_data) >= 50 else None
-        sma_200 = filtered_data['Close'].rolling(window=200).mean().iloc[-1] if len(filtered_data) >= 200 else None
-        ema_50 = filtered_data['Close'].ewm(span=50, adjust=False).mean().iloc[-1] if len(filtered_data) >= 50 else None
-        ema_200 = filtered_data['Close'].ewm(span=200, adjust=False).mean().iloc[-1] if len(filtered_data) >= 200 else None
+        # Get statistics and indicator values from data manager
+        period_stats = self.data_manager.calculate_period_stats(filtered_data)
+        indicators = self.data_manager.get_indicator_values(filtered_data)
         
         # Format the information
         info_text = f"""
 ### 📊 {self.current_symbol} Statistics
 
-**Current Price:** ${latest_price:,.2f}
+**Current Price:** ${period_stats['current_price']:,.2f}
 
-**Period Change:** {price_change:+.2f}%
+**Period Change:** {period_stats['period_change']:+.2f}%
 
-**Period High:** ${high_price:,.2f}
+**Period High:** ${period_stats['period_high']:,.2f}
 
-**Period Low:** ${low_price:,.2f}
+**Period Low:** ${period_stats['period_low']:,.2f}
 
-**Avg Volume:** {avg_volume:,.0f}
+**Avg Volume:** {period_stats['avg_volume']:,.0f}
 
 ---
 
 ### 📈 Technical Indicators
 """
         
-        if sma_50:
-            info_text += f"\n**SMA 50:** ${sma_50:,.2f}\n"
-        if sma_200:
-            info_text += f"\n**SMA 200:** ${sma_200:,.2f}\n"
-        if ema_50:
-            info_text += f"\n**EMA 50:** ${ema_50:,.2f}\n"
-        if ema_200:
-            info_text += f"\n**EMA 200:** ${ema_200:,.2f}\n"
+        if indicators['sma_50']:
+            info_text += f"\n**SMA 50:** ${indicators['sma_50']:,.2f}\n"
+        if indicators['sma_200']:
+            info_text += f"\n**SMA 200:** ${indicators['sma_200']:,.2f}\n"
+        if indicators['ema_50']:
+            info_text += f"\n**EMA 50:** ${indicators['ema_50']:,.2f}\n"
+        if indicators['ema_200']:
+            info_text += f"\n**EMA 200:** ${indicators['ema_200']:,.2f}\n"
         
         # Add trend signal
-        if sma_50 and sma_200:
-            if sma_50 > sma_200:
+        if indicators['trend']:
+            if indicators['trend'] == 'bullish':
                 info_text += f"\n---\n\n**Trend:** 🟢 Bullish (Golden Cross)\n"
             else:
                 info_text += f"\n---\n\n**Trend:** 🔴 Bearish (Death Cross)\n"
         
-        info_text += f"\n**Data Points:** {len(filtered_data):,}"
+        info_text += f"\n**Data Points:** {period_stats['data_points']:,}"
         
         return pn.pane.Markdown(info_text, styles=self.config.styles)
     

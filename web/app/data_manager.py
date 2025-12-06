@@ -123,18 +123,27 @@ class DataManager:
             print(f"Error fetching current price for {symbol}: {e}")
             return 0.0
     
-    def add_moving_averages(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Add Simple and Exponential Moving Averages to the DataFrame."""
+    def add_technical_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Add technical indicators (SMAs and EMAs) to the DataFrame.
+        
+        This is the single source of truth for all moving average calculations.
+        """
         if df.empty:
             return df
             
         df = df.copy()
+        # Simple Moving Averages
         df['SMA_50'] = df['Close'].rolling(window=50).mean()
         df['SMA_200'] = df['Close'].rolling(window=200).mean()
+        # Exponential Moving Averages
         df['EMA_50'] = df['Close'].ewm(span=50, adjust=False).mean()
         df['EMA_200'] = df['Close'].ewm(span=200, adjust=False).mean()
         
         return df
+    
+    def add_moving_averages(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Deprecated: Use add_technical_indicators() instead."""
+        return self.add_technical_indicators(df)
     
     def filter_by_time_interval(self, df: pd.DataFrame, interval: str) -> pd.DataFrame:
         """Filter DataFrame by time interval."""
@@ -148,18 +157,122 @@ class DataManager:
         cutoff_date = datetime.now() - timedelta(days=days)
         return df[df['Date'] >= cutoff_date].copy()
     
-    def get_symbol_stats(self, df: pd.DataFrame) -> Dict[str, float]:
-        """Calculate basic statistics for a symbol."""
+    def _calculate_price_change(self, df: pd.DataFrame, start_idx: int = -2, end_idx: int = -1) -> float:
+        """Calculate percentage price change between two indices.
+        
+        Args:
+            df: DataFrame with Close prices
+            start_idx: Starting index (default -2 for 24h change)
+            end_idx: Ending index (default -1 for latest)
+        """
+        if len(df) < abs(start_idx) + 1:
+            return 0.0
+        return (df['Close'].iloc[end_idx] - df['Close'].iloc[start_idx]) / df['Close'].iloc[start_idx] * 100
+    
+    def calculate_all_time_stats(self, df: pd.DataFrame) -> Dict[str, float]:
+        """Calculate all-time statistics across entire DataFrame.
+        
+        Returns:
+            Dictionary with current_price, ath (all-time high), atl (all-time low), 
+            avg_volume, price_change_24h
+        """
         if df.empty:
-            return {}
+            return {
+                'current_price': 0,
+                'ath': 0,
+                'atl': 0,
+                'avg_volume': 0,
+                'price_change_24h': 0
+            }
         
         return {
-            'current_price': df['Close'].iloc[-1] if len(df) > 0 else 0,
+            'current_price': df['Close'].iloc[-1],
             'ath': df['High'].max(),
             'atl': df['Low'].min(),
             'avg_volume': df['Volume'].mean(),
-            'price_change_24h': (df['Close'].iloc[-1] - df['Close'].iloc[-2]) / df['Close'].iloc[-2] * 100 if len(df) > 1 else 0
+            'price_change_24h': self._calculate_price_change(df, -2, -1)
         }
+    
+    def calculate_period_stats(self, df: pd.DataFrame) -> Dict[str, float]:
+        """Calculate statistics for a specific time period (filtered DataFrame).
+        
+        Returns:
+            Dictionary with current_price, period_change, period_high, period_low, 
+            avg_volume, data_points
+        """
+        if df.empty:
+            return {
+                'current_price': 0,
+                'period_change': 0,
+                'period_high': 0,
+                'period_low': 0,
+                'avg_volume': 0,
+                'data_points': 0
+            }
+        
+        return {
+            'current_price': df['Close'].iloc[-1],
+            'period_change': self._calculate_price_change(df, 0, -1),
+            'period_high': df['High'].max(),
+            'period_low': df['Low'].min(),
+            'avg_volume': df['Volume'].mean(),
+            'data_points': len(df)
+        }
+    
+    def get_indicator_values(self, df: pd.DataFrame) -> Dict:
+        """Extract technical indicator values from DataFrame (must have indicators added).
+        
+        Returns:
+            Dictionary with sma_50, sma_200, ema_50, ema_200, and trend signal.
+            Returns None for missing indicators.
+        """
+        if df.empty:
+            return {
+                'sma_50': None,
+                'sma_200': None,
+                'ema_50': None,
+                'ema_200': None,
+                'trend': None
+            }
+        
+        # Get latest values if columns exist
+        sma_50 = df['SMA_50'].iloc[-1] if 'SMA_50' in df.columns and not df['SMA_50'].isna().iloc[-1] else None
+        sma_200 = df['SMA_200'].iloc[-1] if 'SMA_200' in df.columns and not df['SMA_200'].isna().iloc[-1] else None
+        ema_50 = df['EMA_50'].iloc[-1] if 'EMA_50' in df.columns and not df['EMA_50'].isna().iloc[-1] else None
+        ema_200 = df['EMA_200'].iloc[-1] if 'EMA_200' in df.columns and not df['EMA_200'].isna().iloc[-1] else None
+        
+        # Determine trend based on SMAs
+        trend = None
+        if sma_50 is not None and sma_200 is not None:
+            trend = 'bullish' if sma_50 > sma_200 else 'bearish'
+        
+        return {
+            'sma_50': sma_50,
+            'sma_200': sma_200,
+            'ema_50': ema_50,
+            'ema_200': ema_200,
+            'trend': trend
+        }
+    
+    # Deprecated methods - kept for backward compatibility
+    def get_symbol_stats(self, df: pd.DataFrame) -> Dict[str, float]:
+        """Deprecated: Use calculate_all_time_stats() instead."""
+        return self.calculate_all_time_stats(df)
+    
+    def calculate_basic_stats(self, df: pd.DataFrame) -> Dict[str, float]:
+        """Deprecated: Use calculate_all_time_stats() or calculate_period_stats() instead."""
+        stats = self.calculate_all_time_stats(df)
+        return {
+            'latest_price': stats['current_price'],
+            'price_change_24h': stats['price_change_24h'],
+            'high_price': stats['ath'],
+            'low_price': stats['atl'],
+            'data_points': len(df) if not df.empty else 0
+        }
+    
+    def calculate_technical_indicators(self, df: pd.DataFrame) -> Dict:
+        """Deprecated: Use add_technical_indicators() then get_indicator_values() instead."""
+        return self.get_indicator_values(df)
     
     def fetch_multiple_symbols(self, symbols: List[str]) -> Dict[str, pd.DataFrame]:
         """Fetch data for multiple symbols."""

@@ -186,27 +186,20 @@ class SimplePriceDashboard(BaseDashboard):
         if self.current_data is None or self.current_data.empty:
             return pn.pane.Markdown("No statistics available")
         
-        # Calculate basic stats
-        latest_price = self.current_data['Close'].iloc[-1]
-        price_change_24h = (
-            (self.current_data['Close'].iloc[-1] - self.current_data['Close'].iloc[-2]) 
-            / self.current_data['Close'].iloc[-2] * 100
-        ) if len(self.current_data) > 1 else 0
-        
-        high_price = self.current_data['High'].max()
-        low_price = self.current_data['Low'].min()
+        # Get all-time statistics from data manager
+        stats = self.data_manager.calculate_all_time_stats(self.current_data)
         
         # Format the information
         info_text = f"""
         ### 📊 {self.current_symbol} Statistics
         
-        **Current Price:** ${latest_price:,.2f}
+        **Current Price:** ${stats['current_price']:,.2f}
         
-        **24h Change:** {price_change_24h:+.2f}%
+        **24h Change:** {stats['price_change_24h']:+.2f}%
         
-        **All-Time High:** ${high_price:,.2f}
+        **All-Time High:** ${stats['ath']:,.2f}
         
-        **All-Time Low:** ${low_price:,.2f}
+        **All-Time Low:** ${stats['atl']:,.2f}
         
         **Data Points:** {len(self.current_data):,}
         """
