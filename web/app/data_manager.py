@@ -389,3 +389,97 @@ class DataManager:
                 df = self.add_moving_averages(df)
                 result[symbol] = df
         return result
+    
+    def calculate_rolling_correlation(self, df1: pd.DataFrame, df2: pd.DataFrame, window: int = 30) -> pd.Series:
+        """Calculate rolling Pearson correlation between two price series.
+        
+        Args:
+            df1: First DataFrame with 'Close' prices
+            df2: Second DataFrame with 'Close' prices (typically BTC)
+            window: Rolling window size in periods (default 30)
+        
+        Returns:
+            Series with rolling correlation values (-1 to +1)
+            Values > 0.7: Strong coupling
+            Values 0.3-0.7: Moderate correlation
+            Values < 0.3: Decoupling
+        """
+        if df1.empty or df2.empty:
+            return pd.Series(dtype=float)
+        
+        # Align dataframes by date
+        merged = pd.merge(df1[['Date', 'Close']], df2[['Date', 'Close']], 
+                         on='Date', suffixes=('_1', '_2'))
+        
+        if len(merged) < window:
+            return pd.Series(dtype=float)
+        
+        # Calculate rolling correlation
+        correlation = merged['Close_1'].rolling(window=window).corr(merged['Close_2'])
+        
+        return correlation
+    
+    def calculate_beta_coefficient(self, df_asset: pd.DataFrame, df_market: pd.DataFrame, window: int = 30) -> pd.Series:
+        """Calculate rolling beta coefficient (market sensitivity).
+        
+        Beta measures how much an asset moves relative to market (BTC) movements.
+        
+        Args:
+            df_asset: Asset DataFrame with 'Close' prices
+            df_market: Market DataFrame with 'Close' prices (typically BTC)
+            window: Rolling window size in periods (default 30)
+        
+        Returns:
+            Series with beta values:
+            Beta > 1: Asset is more volatile than market (amplified movements)
+            Beta = 1: Moves in line with market
+            Beta < 1: Less volatile than market
+            Beta < 0: Moves opposite to market
+        """
+        if df_asset.empty or df_market.empty:
+            return pd.Series(dtype=float)
+        
+        # Align dataframes by date
+        merged = pd.merge(df_asset[['Date', 'Close']], df_market[['Date', 'Close']], 
+                         on='Date', suffixes=('_asset', '_market'))
+        
+        if len(merged) < window + 1:
+            return pd.Series(dtype=float)
+        
+        # Calculate returns
+        merged['return_asset'] = merged['Close_asset'].pct_change()
+        merged['return_market'] = merged['Close_market'].pct_change()
+        
+        # Calculate rolling beta: Covariance(asset, market) / Variance(market)
+        def rolling_beta(returns_asset, returns_market):
+            covariance = returns_asset.cov(returns_market)
+            variance = returns_market.var()
+            if variance == 0 or pd.isna(variance):
+                return float('nan')
+            return covariance / variance
+        
+        beta = merged['return_asset'].rolling(window=window).apply(
+            lambda x: rolling_beta(x, merged['return_market'].loc[x.index]), 
+            raw=False
+        )
+        
+        return beta
+    
+    def get_latest_correlation_beta(self, df_asset: pd.DataFrame, df_btc: pd.DataFrame, window: int = 30) -> Tuple[float, float]:
+        """Get the latest correlation and beta values for an asset vs BTC.
+        
+        Args:
+            df_asset: Asset DataFrame
+            df_btc: Bitcoin DataFrame
+            window: Rolling window size (default 30)
+        
+        Returns:
+            Tuple of (correlation, beta) - both as floats
+        """
+        correlation_series = self.calculate_rolling_correlation(df_asset, df_btc, window)
+        beta_series = self.calculate_beta_coefficient(df_asset, df_btc, window)
+        
+        correlation = correlation_series.iloc[-1] if not correlation_series.empty and not pd.isna(correlation_series.iloc[-1]) else 0.0
+        beta = beta_series.iloc[-1] if not beta_series.empty and not pd.isna(beta_series.iloc[-1]) else 0.0
+        
+        return correlation, beta

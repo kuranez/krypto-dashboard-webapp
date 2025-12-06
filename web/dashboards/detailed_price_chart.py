@@ -152,9 +152,9 @@ class DetailedPriceDashboard(BaseDashboard):
         fig = make_subplots(
             rows=2, cols=1,
             shared_xaxes=True,
-            vertical_spacing=0.03,
-            row_heights=[0.7, 0.3],
-            subplot_titles=(f'{self.current_symbol} Price Chart ({self.current_period})', 'Volume')
+            vertical_spacing=0.08,
+            row_heights=[0.8, 0.2],
+            subplot_titles=(f'{self.current_symbol} Price Chart ({self.current_period})', 'Trading Volume')
         )
         
         # Price traces - High, Low, Close using crypto colors
@@ -244,14 +244,44 @@ class DetailedPriceDashboard(BaseDashboard):
             row=1, col=1
         )
         
-        # Volume trace - using crypto colors
-        colors = [to_rgba(primary_color, 0.6) if close >= open_ else to_rgba(secondary_color, 0.4)
-                  for close, open_ in zip(df['Close'], df['Open'])]
+        # Prepare volume data - aggregate by week/month for larger time periods
+        # Determine aggregation period based on selected time period
+        if self.current_period in ['2Y', '3Y', '5Y', 'ALL']:
+            # For very long periods (2Y+), aggregate by month
+            df_copy = df.copy()
+            df_copy['Month'] = df_copy['Date'].dt.to_period('M').apply(lambda r: r.start_time)
+            df_volume = df_copy.groupby('Month').agg({
+                'Volume': 'sum',
+                'Close': 'last',
+                'Open': 'first'
+            }).reset_index()
+            df_volume.rename(columns={'Month': 'Date'}, inplace=True)
+        elif self.current_period in ['3M', '6M', '1Y']:
+            # For medium periods (3M-1Y), aggregate by week
+            df_copy = df.copy()
+            df_copy['Week'] = df_copy['Date'].dt.to_period('W').apply(lambda r: r.start_time)
+            df_volume = df_copy.groupby('Week').agg({
+                'Volume': 'sum',
+                'Close': 'last',
+                'Open': 'first'
+            }).reset_index()
+            df_volume.rename(columns={'Week': 'Date'}, inplace=True)
+        else:
+            # For shorter periods (1D, 1W, 1M), aggregate by day
+            df_volume = df.groupby('Date').agg({
+                'Volume': 'sum',
+                'Close': 'last',
+                'Open': 'first'
+            }).reset_index()
+        
+        # Volume trace - using green for up, red for down (matching SMA/EMA colors)
+        colors = ['rgba(26, 188, 156, 0.8)' if close >= open_ else 'rgba(231, 76, 60, 0.8)'
+                  for close, open_ in zip(df_volume['Close'], df_volume['Open'])]
         
         fig.add_trace(
             go.Bar(
-                x=df['Date'],
-                y=df['Volume'],
+                x=df_volume['Date'],
+                y=df_volume['Volume'],
                 name='Volume',
                 marker_color=colors,
                 hovertemplate='Volume: %{y:,.0f}<extra></extra>'
@@ -267,14 +297,14 @@ class DetailedPriceDashboard(BaseDashboard):
             legend=dict(
                 orientation="h",
                 yanchor="top",
-                y=-0.15,
+                y=-0.12,
                 xanchor="center",
                 x=0.5
             ),
             xaxis2_title="Date",
             yaxis_title="Price (USD)",
             yaxis2_title="Volume",
-            xaxis_rangeslider_visible=True,
+            xaxis_rangeslider_visible=False,
             autosize=True,
             margin=dict(l=50, r=50, t=80, b=50)
         )
@@ -283,7 +313,10 @@ class DetailedPriceDashboard(BaseDashboard):
         fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128, 128, 128, 0.2)')
         fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128, 128, 128, 0.2)')
         
-        return pn.pane.Plotly(fig, sizing_mode='stretch_both')
+        # Format volume y-axis with better readability
+        fig.update_yaxes(row=2, col=1, tickformat='.2s')
+        
+        return pn.pane.Plotly(fig, sizing_mode='stretch_both', config={'responsive': True})
     
     def _create_info_panel(self):
         """Create an information panel with current stats and indicators."""
@@ -364,6 +397,77 @@ class DetailedPriceDashboard(BaseDashboard):
             }
         )
         
+        # Quick summary box
+        summary_box = pn.pane.Markdown(
+            """
+            **Quick Overview:** <br>
+            <br>
+            Advanced price chart with technical indicators including Simple Moving Averages (SMA) and 
+            Exponential Moving Averages (EMA), combined with trading volume analysis. <br>
+            <br>
+            *See bottom of page for detailed indicator explanations.*
+            """,
+            styles={
+                'font-size': '14px',
+                'background-color': '#f8f9fa',
+                'color': '#2c3e50',
+                'padding': '12px 20px',
+                'border-radius': '5px',
+                'border-left': f'4px solid {self.config.primary_color}',
+                'margin': '10px 0px'
+            },
+            sizing_mode='stretch_width'
+        )
+        
+        # Detailed explanation
+        explanation = pn.pane.Markdown(
+            """
+            ## Technical Analysis Guide
+            
+            This dashboard provides comprehensive technical analysis tools for cryptocurrency price movements.
+            
+            **Chart Components:**
+            - **Price Chart (Top)**: Historical price data with High, Low, and Close values
+            - **Volume Chart (Bottom)**: Trading volume aggregated by day, week, or month depending on time period
+            
+            ---
+            
+            **Understanding Technical Indicators:**
+            
+            **Simple Moving Average (SMA):** Average price over a specific period
+            - **SMA 50**: 50-period moving average - short to medium-term trend indicator
+            - **SMA 200**: 200-period moving average - long-term trend indicator
+            - **Golden Cross**: When SMA 50 crosses above SMA 200 (bullish signal 🟢)
+            - **Death Cross**: When SMA 50 crosses below SMA 200 (bearish signal 🔴)
+            
+            **Exponential Moving Average (EMA):** Weighted average giving more importance to recent prices
+            - **EMA 50**: More responsive to recent price changes than SMA 50
+            - **EMA 200**: Faster-reacting long-term trend indicator than SMA 200
+            - EMAs respond more quickly to price changes, making them useful for identifying trend changes earlier
+            
+            **Volume Analysis:**
+            - **Green bars**: Price closed higher than it opened (bullish)
+            - **Red/Other bars**: Price closed lower than it opened (bearish)
+            - **High volume + price increase**: Strong buying pressure
+            - **High volume + price decrease**: Strong selling pressure
+            - Volume aggregation varies by timeframe:
+              - Short periods (1D-1M): Daily volume
+              - Medium periods (3M-1Y): Weekly volume
+              - Long periods (2Y+): Monthly volume
+            
+            *Use these indicators together to make informed trading decisions. Always do your own research.*
+            """,
+            styles={
+                'font-size': '14px',
+                'background-color': '#47356A',
+                'color': 'white',
+                'padding': '20px',
+                'border-radius': '5px',
+                'margin-top': '10px'
+            },
+            sizing_mode='stretch_width'
+        )
+        
         # Controls row
         controls = pn.Row(
             self.widgets['symbol_selector'],
@@ -373,8 +477,8 @@ class DetailedPriceDashboard(BaseDashboard):
         )
         
         # Create reactive panes that can be updated
-        self.chart_pane = pn.Column(sizing_mode='stretch_both', min_height=800)
-        self.info_pane = pn.Column(width=300, sizing_mode='fixed')
+        self.chart_pane = pn.Column(sizing_mode='stretch_width', min_height=800)
+        self.info_pane = pn.Column(width=280, max_width=280, sizing_mode='fixed', margin=(0, 0, 0, 15))
 
         # Initialize with current data
         self._update_display()
@@ -382,6 +486,7 @@ class DetailedPriceDashboard(BaseDashboard):
         # Create layout with responsive design
         layout = pn.Column(
             header,
+            summary_box,
             pn.layout.Divider(),
             controls,
             pn.layout.Divider(),
@@ -390,6 +495,7 @@ class DetailedPriceDashboard(BaseDashboard):
                 self.info_pane,
                 sizing_mode='stretch_width'
             ),
+            explanation,
             sizing_mode='stretch_width',
             margin=(20, 20)
         )

@@ -59,18 +59,18 @@ class SimplePriceDashboard(BaseDashboard):
             margin=(5, 10)
         )
         
-        self.widgets['chart_type'] = pn.widgets.Select(
-            name='Chart Type',
-            options=['Line', 'Candlestick', 'Volume'],
-            value=self.current_chart_type,
-            width=150,
-            margin=(5, 10)
-        )
+        # self.widgets['chart_type'] = pn.widgets.Select(
+        #     name='Chart Type',
+        #     options=['Line', 'Candlestick', 'Volume'],
+        #     value=self.current_chart_type,
+        #     width=150,
+        #     margin=(5, 10)
+        # )
         
         # Bind events
         self.widgets['symbol_selector'].param.watch(self._on_symbol_change, 'value')
         self.widgets['period_selector'].param.watch(self._on_period_change, 'value')
-        self.widgets['chart_type'].param.watch(self._on_chart_type_change, 'value')
+        # self.widgets['chart_type'].param.watch(self._on_chart_type_change, 'value')
     
     def _on_symbol_change(self, event):
         """Handle symbol change."""
@@ -238,11 +238,31 @@ class SimplePriceDashboard(BaseDashboard):
             }
         )
         
+        # Quick summary box
+        summary_box = pn.pane.Markdown(
+            """
+            **Quick Overview:** <br>
+            <br>
+            Track individual cryptocurrency price movements over time.
+            Select your preferred cryptocurrency and time period to view historical price trends.
+            """,
+            styles={
+                'font-size': '14px',
+                'background-color': '#f8f9fa',
+                'color': '#2c3e50',
+                'padding': '12px 20px',
+                'border-radius': '5px',
+                'border-left': f'4px solid {self.config.primary_color}',
+                'margin': '10px 0px'
+            },
+            sizing_mode='stretch_width'
+        )
+        
         # Controls row
         controls = pn.Row(
             self.widgets['symbol_selector'],
             self.widgets['period_selector'],
-            self.widgets['chart_type'],
+            # self.widgets['chart_type'],
             # sizing_mode='stretch_width',
             margin=(10, 0)
         )
@@ -257,6 +277,7 @@ class SimplePriceDashboard(BaseDashboard):
         # Create layout with responsive design
         layout = pn.Column(
             header,
+            summary_box,
             pn.layout.Divider(),
             controls,
             pn.layout.Divider(),
