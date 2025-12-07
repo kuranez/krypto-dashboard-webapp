@@ -1,54 +1,92 @@
-#!/usr/bin/env python3
 """
-Quick test script to verify the correlation and beta calculations work correctly.
+Pytest tests to verify the correlation and beta calculations work correctly.
 """
-
-import sys
-from pathlib import Path
-
-# Add the app directory to Python path
-app_dir = Path(__file__).parent / 'web' / 'app'
-sys.path.insert(0, str(app_dir))
-
+import pytest
 import pandas as pd
 from data_manager import DataManager
 
-def test_correlation_beta():
-    """Test the correlation and beta calculation methods."""
-    print("🧪 Testing Correlation and Beta Calculations\n")
+
+@pytest.fixture
+def data_manager():
+    """Create a DataManager instance for testing."""
+    return DataManager()
+
+
+@pytest.fixture
+def btc_data(data_manager):
+    """Fetch BTC data for testing."""
+    df = data_manager.fetch_combined_data('BTCUSDT')
+    assert not df.empty, "Failed to fetch BTC data"
+    return df
+
+
+@pytest.fixture
+def eth_data(data_manager):
+    """Fetch ETH data for testing."""
+    df = data_manager.fetch_combined_data('ETHUSDT')
+    assert not df.empty, "Failed to fetch ETH data"
+    return df
+
+
+class TestCorrelationBeta:
+    """Test suite for correlation and beta calculations."""
     
-    dm = DataManager()
+    def test_fetch_btc_data(self, btc_data):
+        """Test that BTC data can be fetched."""
+        assert isinstance(btc_data, pd.DataFrame)
+        assert len(btc_data) > 0
+        print(f"\n   ✓ BTC: {len(btc_data)} data points")
     
-    # Test with BTC and ETH
-    print("📊 Fetching BTC data...")
-    df_btc = dm.fetch_combined_data('BTCUSDT')
-    print(f"   ✓ BTC: {len(df_btc)} data points")
+    def test_fetch_eth_data(self, eth_data):
+        """Test that ETH data can be fetched."""
+        assert isinstance(eth_data, pd.DataFrame)
+        assert len(eth_data) > 0
+        print(f"\n   ✓ ETH: {len(eth_data)} data points")
     
-    print("📊 Fetching ETH data...")
-    df_eth = dm.fetch_combined_data('ETHUSDT')
-    print(f"   ✓ ETH: {len(df_eth)} data points")
-    
-    if not df_btc.empty and not df_eth.empty:
-        print("\n📈 Calculating rolling correlation (30-day window)...")
-        corr_series = dm.calculate_rolling_correlation(df_eth, df_btc, window=30)
-        print(f"   ✓ Correlation series: {len(corr_series)} values")
-        if not corr_series.empty:
-            latest_corr = corr_series.iloc[-1]
-            print(f"   ✓ Latest correlation: {latest_corr:.4f}")
+    def test_rolling_correlation(self, data_manager, eth_data, btc_data):
+        """Test rolling correlation calculation."""
+        window = 30
+        corr_series = data_manager.calculate_rolling_correlation(eth_data, btc_data, window=window)
         
-        print("\n📈 Calculating rolling beta (30-day window)...")
-        beta_series = dm.calculate_beta_coefficient(df_eth, df_btc, window=30)
-        print(f"   ✓ Beta series: {len(beta_series)} values")
-        if not beta_series.empty:
-            latest_beta = beta_series.iloc[-1]
-            print(f"   ✓ Latest beta: {latest_beta:.4f}")
+        assert isinstance(corr_series, pd.Series)
+        assert len(corr_series) > 0
+        assert not corr_series.empty
         
-        print("\n📊 Using helper method get_latest_correlation_beta()...")
-        correlation, beta = dm.get_latest_correlation_beta(df_eth, df_btc, window=30)
-        print(f"   ✓ Correlation: {correlation:.4f}")
+        latest_corr = corr_series.iloc[-1]
+        assert -1 <= latest_corr <= 1, "Correlation must be between -1 and 1"
+        
+        print(f"\n   ✓ Correlation series: {len(corr_series)} values")
+        print(f"   ✓ Latest correlation: {latest_corr:.4f}")
+    
+    def test_rolling_beta(self, data_manager, eth_data, btc_data):
+        """Test rolling beta coefficient calculation."""
+        window = 30
+        beta_series = data_manager.calculate_beta_coefficient(eth_data, btc_data, window=window)
+        
+        assert isinstance(beta_series, pd.Series)
+        assert len(beta_series) > 0
+        assert not beta_series.empty
+        
+        latest_beta = beta_series.iloc[-1]
+        assert latest_beta > 0, "Beta should be positive for positively correlated assets"
+        
+        print(f"\n   ✓ Beta series: {len(beta_series)} values")
+        print(f"   ✓ Latest beta: {latest_beta:.4f}")
+    
+    def test_get_latest_correlation_beta(self, data_manager, eth_data, btc_data):
+        """Test the helper method that returns both correlation and beta."""
+        window = 30
+        correlation, beta = data_manager.get_latest_correlation_beta(eth_data, btc_data, window=window)
+        
+        assert isinstance(correlation, (float, int))
+        assert isinstance(beta, (float, int))
+        assert -1 <= correlation <= 1, "Correlation must be between -1 and 1"
+        assert beta > 0, "Beta should be positive for positively correlated assets"
+        
+        print(f"\n   ✓ Correlation: {correlation:.4f}")
         print(f"   ✓ Beta: {beta:.4f}")
         
-        print("\n✅ All tests passed!")
+        # Print interpretation
         print("\n📝 Interpretation:")
         if correlation > 0.7:
             print(f"   🟢 ETH is strongly coupled with BTC (correlation: {correlation:.3f})")
@@ -63,18 +101,3 @@ def test_correlation_beta():
             print(f"   📉 ETH is {((1 - beta) * 100):.1f}% less volatile than BTC (beta: {beta:.3f})")
         else:
             print(f"   ➡️  ETH moves in line with BTC (beta: {beta:.3f})")
-    else:
-        print("❌ Failed to fetch data")
-        return False
-    
-    return True
-
-if __name__ == "__main__":
-    try:
-        success = test_correlation_beta()
-        sys.exit(0 if success else 1)
-    except Exception as e:
-        print(f"\n❌ Error: {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
