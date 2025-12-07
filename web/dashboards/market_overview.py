@@ -281,18 +281,18 @@ class MarketOverviewDashboard(BaseDashboard):
                 marker_color=self._convert_color(color_b, 0.6),
                 orientation='h',
                 hovertemplate=(
-                    f'<b>{symbol} - All-Time-High</b><br><br>'
-                    f'ATH Price: <b>$ {ath:,.2f}</b><br>'
-                    f'Current Price: <b>$ {current:,.2f}</b><br>'
-                    f'Δ from ATH: <b>$ {delta_ath:,.2f} ({delta_ath_pct:+.2f}%)</b><br><br>'
+                    f'<b>{symbol}</b> - <i>All-Time-High</i><br><br>'
+                    f'<b>ATH Price</b>: <b>$ {ath:,.2f}</b><br>'
+                    f'<b>Current Price</b>: <b>$ {current:,.2f}</b><br>'
+                    f'<b>Δ from ATH</b>: <b>$ {delta_ath:,.2f} ({delta_ath_pct:+.2f}%)</b><br><br>'
                     f'<i>90-Day Range:</i><br>'
-                    f'  High: <b>$ {high_90d:,.2f}</b><br>'
-                    f'  Low: <b>$ {low_90d:,.2f}</b><br>'
-                    f'  Δ: <b>$ {delta_90d:,.2f} ({delta_90d_pct:.2f}%)</b><br><br>'
+                    f'  <b>High</b>: <b>$ {high_90d:,.2f}</b><br>'
+                    f'  <b>Low</b>: <b>$ {low_90d:,.2f}</b><br>'
+                    f'  <b>Δ</b>: <b>$ {delta_90d:,.2f} ({delta_90d_pct:.2f}%)</b><br><br>'
                     f'<i>1-Year Range:</i><br>'
-                    f'  High: <b>$ {high_365d:,.2f}</b><br>'
-                    f'  Low: <b>$ {low_365d:,.2f}</b><br>'
-                    f'  Δ: <b>$ {delta_365d:,.2f} ({delta_365d_pct:.2f}%)</b>'
+                    f'  <b>High</b>: <b>$ {high_365d:,.2f}</b><br>'
+                    f'  <b>Low</b>: <b>$ {low_365d:,.2f}</b><br>'
+                    f'  <b>Δ</b>: <b>$ {delta_365d:,.2f} ({delta_365d_pct:.2f}%)</b>'
                     '<extra></extra>'
                 ),
                 showlegend=False
@@ -307,18 +307,18 @@ class MarketOverviewDashboard(BaseDashboard):
                 marker_color=self._convert_color(color_a, 0.8),
                 orientation='h',
                 hovertemplate=(
-                    f'<b>{symbol} - Current Price</b><br><br>'
-                    f'Current: <b>$ {current:,.2f}</b><br>'
-                    f'ATH: <b>$ {ath:,.2f}</b><br>'
-                    f'Δ from ATH: <b>$ {delta_ath:,.2f} ({delta_ath_pct:+.2f}%)</b><br><br>'
+                    f'<b>{symbol}</b> - <i>Current Price</i><br><br>'
+                    f'<b>Current</b>: <b>$ {current:,.2f}</b><br>'
+                    f'<b>ATH</b>: <b>$ {ath:,.2f}</b><br>'
+                    f'<b>Δ from ATH</b>: <b>$ {delta_ath:,.2f} ({delta_ath_pct:+.2f}%)</b><br><br>'
                     f'<i>90-Day Range:</i><br>'
-                    f'  High: <b>$ {high_90d:,.2f}</b><br>'
-                    f'  Low: <b>$ {low_90d:,.2f}</b><br>'
-                    f'  Δ: <b>$ {delta_90d:,.2f} ({delta_90d_pct:.2f}%)</b><br><br>'
+                    f'  <b>High</b>: <b>$ {high_90d:,.2f}</b><br>'
+                    f'  <b>Low</b>: <b>$ {low_90d:,.2f}</b><br>'
+                    f'  <b>Δ</b>: <b>$ {delta_90d:,.2f} ({delta_90d_pct:.2f}%)</b><br><br>'
                     f'<i>1-Year Range:</i><br>'
-                    f'  High: <b>$ {high_365d:,.2f}</b><br>'
-                    f'  Low: <b>$ {low_365d:,.2f}</b><br>'
-                    f'  Δ: <b>$ {delta_365d:,.2f} ({delta_365d_pct:.2f}%)</b>'
+                    f'  <b>High</b>: <b>$ {high_365d:,.2f}</b><br>'
+                    f'  <b>Low</b>: <b>$ {low_365d:,.2f}</b><br>'
+                    f'  <b>Δ</b>: <b>$ {delta_365d:,.2f} ({delta_365d_pct:.2f}%)</b>'
                     '<extra></extra>'
                 ),
                 showlegend=False
@@ -334,10 +334,10 @@ class MarketOverviewDashboard(BaseDashboard):
                 line=dict(color='rgba(26, 188, 156, 0.8)', width=3),
                 marker=dict(size=8, symbol='diamond', color='rgba(26, 188, 156, 0.8)'),
                 hovertemplate=(
-                    f'<b>{symbol} - 90-Day Range</b><br><br>'
-                    f'High: <b>$ {high_90d:,.2f}</b><br>'
-                    f'Low: <b>$ {low_90d:,.2f}</b><br>'
-                    f'Δ: <b>$ {delta_90d:,.2f} ({delta_90d_pct:.2f}%)</b>'
+                    f'<b>{symbol}</b> - <i>90-Day Range</i><br><br>'
+                    f'<b>High</b>: <b>$ {high_90d:,.2f}</b><br>'
+                    f'<b>Low</b>: <b>$ {low_90d:,.2f}</b><br>'
+                    f'<b>Δ</b>: <b>$ {delta_90d:,.2f} ({delta_90d_pct:.2f}%)</b>'
                     '<extra></extra>'
                 ),
                 showlegend=False
@@ -353,10 +353,10 @@ class MarketOverviewDashboard(BaseDashboard):
                 line=dict(color='rgba(231, 76, 60, 0.8)', width=2, dash='dot'),
                 marker=dict(size=6, symbol='square', color='rgba(231, 76, 60, 0.8)'),
                 hovertemplate=(
-                    f'<b>{symbol} - 1-Year Range</b><br><br>'
-                    f'High: <b>$ {high_365d:,.2f}</b><br>'
-                    f'Low: <b>$ {low_365d:,.2f}</b><br>'
-                    f'Δ: <b>$ {delta_365d:,.2f} ({delta_365d_pct:.2f}%)</b>'
+                    f'<b>{symbol}</b> - <i>1-Year Range</i><br><br>'
+                    f'<b>High</b>: <b>$ {high_365d:,.2f}</b><br>'
+                    f'<b>Low</b>: <b>$ {low_365d:,.2f}</b><br>'
+                    f'<b>Δ</b>: <b>$ {delta_365d:,.2f} ({delta_365d_pct:.2f}%)</b>'
                     '<extra></extra>'
                 ),
                 showlegend=False
@@ -421,7 +421,7 @@ class MarketOverviewDashboard(BaseDashboard):
             barmode='overlay',
             template=self.config.get_plotly_template(),
             showlegend=True,
-            hoverlabel=dict(font_size=12),
+            hoverlabel=dict(font_size=14),
             legend=dict(
             orientation="h",
             yanchor="top",

@@ -51,7 +51,7 @@ class FigureFactory:
             line=dict(color=self.convert_color(primary_color, 0.8), width=2),
             fill='tozeroy',
             fillcolor=self.convert_color(secondary_color, 0.3),
-            hovertemplate=f'{symbol}<br>Date: %{{x}}<br>Price: $ %{{y:,.2f}}<extra></extra>'
+            hovertemplate=f'<b>{symbol}</b><br>Date: <b>%{{x}}</b><br>Price: <b>$ %{{y:,.2f}}</b><extra></extra>'
         ))
         
         # Calculate price range for better y-axis

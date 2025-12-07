@@ -174,7 +174,7 @@ class DetailedPriceDashboard(BaseDashboard):
                 mode='lines',
                 name='High',
                 line=dict(color=to_rgba(primary_color, 0.4), width=1),
-                hovertemplate='High: $%{y:,.2f}<extra></extra>'
+                hovertemplate='<b>High</b>: <b>$%{y:,.2f}</b><extra></extra>'
             ),
             row=1, col=1
         )
@@ -186,7 +186,7 @@ class DetailedPriceDashboard(BaseDashboard):
                 mode='lines',
                 name='Low',
                 line=dict(color=to_rgba(secondary_color, 0.4), width=1),
-                hovertemplate='Low: $%{y:,.2f}<extra></extra>'
+                hovertemplate='<b>Low</b>: <b>$%{y:,.2f}</b><extra></extra>'
             ),
             row=1, col=1
         )
@@ -198,7 +198,7 @@ class DetailedPriceDashboard(BaseDashboard):
                 mode='lines',
                 name='Close',
                 line=dict(color=color_a, width=2),
-                hovertemplate='Close: $%{y:,.2f}<extra></extra>'
+                hovertemplate='<b>Close</b>: <b>$%{y:,.2f}</b><extra></extra>'
             ),
             row=1, col=1
         )
@@ -211,7 +211,7 @@ class DetailedPriceDashboard(BaseDashboard):
                 mode='lines',
                 name='SMA 50',
                 line=dict(color='rgba(231, 76, 60, 0.8)', width=1.5, dash='dash'),
-                hovertemplate='SMA 50: $%{y:,.2f}<extra></extra>'
+                hovertemplate='<b>SMA 50</b>: <b>$%{y:,.2f}</b><extra></extra>'
             ),
             row=1, col=1
         )
@@ -223,7 +223,7 @@ class DetailedPriceDashboard(BaseDashboard):
                 mode='lines',
                 name='SMA 200',
                 line=dict(color='rgba(155, 89, 182, 0.8)', width=1.5, dash='dash'),
-                hovertemplate='SMA 200: $%{y:,.2f}<extra></extra>'
+                hovertemplate='<b>SMA 200</b>: <b>$%{y:,.2f}</b><extra></extra>'
             ),
             row=1, col=1
         )
@@ -236,7 +236,7 @@ class DetailedPriceDashboard(BaseDashboard):
                 mode='lines',
                 name='EMA 50',
                 line=dict(color='rgba(243, 156, 18, 0.8)', width=1.5, dash='dot'),
-                hovertemplate='EMA 50: $%{y:,.2f}<extra></extra>'
+                hovertemplate='<b>EMA 50</b>: <b>$%{y:,.2f}</b><extra></extra>'
             ),
             row=1, col=1
         )
@@ -248,7 +248,7 @@ class DetailedPriceDashboard(BaseDashboard):
                 mode='lines',
                 name='EMA 200',
                 line=dict(color='rgba(26, 188, 156, 0.8)', width=1.5, dash='dot'),
-                hovertemplate='EMA 200: $%{y:,.2f}<extra></extra>'
+                hovertemplate='<b>EMA 200</b>: <b>$%{y:,.2f}</b><extra></extra>'
             ),
             row=1, col=1
         )
@@ -293,7 +293,7 @@ class DetailedPriceDashboard(BaseDashboard):
                 y=df_volume['Volume'],
                 name='Volume',
                 marker_color=colors,
-                hovertemplate='Volume: %{y:,.0f}<extra></extra>'
+                hovertemplate='Volume: <b>%{y:,.0f}</b><extra></extra>'
             ),
             row=2, col=1
         )
@@ -302,7 +302,7 @@ class DetailedPriceDashboard(BaseDashboard):
         fig.update_layout(
             template=self.config.get_plotly_template(),
             hovermode='x unified',
-            hoverlabel=dict(font_size=12),
+            hoverlabel=dict(font_size=14),
             showlegend=True,
             legend=dict(
                 orientation="h",
