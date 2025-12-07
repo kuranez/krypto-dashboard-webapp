@@ -163,7 +163,7 @@ class DetailedPriceDashboard(BaseDashboard):
         for annotation in fig.layout.annotations:
             annotation.update(
                 font=dict(size=18, color='#47356A'),
-                y=annotation.y - 0.03  # Move subtitle down to create space
+                y=annotation.y + 0.03  # Move subtitle up to create more space
             )
         
         # Price traces - High, Low, Close using crypto colors
@@ -327,7 +327,7 @@ class DetailedPriceDashboard(BaseDashboard):
             yaxis2_title="Volume",
             xaxis_rangeslider_visible=False,
             autosize=True,
-            margin=dict(l=30, r=30, t=150, b=250)
+            margin=dict(l=30, r=30, t=140, b=200)
         )
         
         # Update axes
