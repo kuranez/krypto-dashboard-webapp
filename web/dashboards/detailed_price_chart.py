@@ -429,7 +429,7 @@ class DetailedPriceDashboard(BaseDashboard):
             *See bottom of page for detailed indicator explanations.*
             """,
             styles={
-                'font-size': '14px',
+                'font-size': '16px',
                 'background-color': '#f8f9fa',
                 'color': '#2c3e50',
                 'padding': '12px 20px',
@@ -479,7 +479,7 @@ class DetailedPriceDashboard(BaseDashboard):
             *Use these indicators together to make informed trading decisions. Always do your own research.*
             """,
             styles={
-                'font-size': '14px',
+                'font-size': '16px',
                 'background-color': '#47356A',
                 'color': 'white',
                 'padding': '20px',

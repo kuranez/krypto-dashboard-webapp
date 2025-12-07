@@ -555,7 +555,7 @@ class MarketOverviewDashboard(BaseDashboard):
             *See bottom of page for detailed explanations.*
             """,
             styles={
-                'font-size': '14px',
+                'font-size': '16px',
                 'background-color': '#f8f9fa',
                 'color': '#2c3e50',
                 'padding': '12px 20px',
@@ -601,7 +601,7 @@ class MarketOverviewDashboard(BaseDashboard):
             *Example: A beta of 1.5 means the asset moves 50% more than BTC in the same direction*
             """,
             styles={
-                'font-size': '14px',
+                'font-size': '16px',
                 'background-color': '#47356A',
                 'color': 'white',
                 'padding': '20px',
