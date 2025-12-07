@@ -128,7 +128,7 @@ class SimplePriceDashboard(BaseDashboard):
     def _create_price_chart(self):
         """Create the main price chart based on selected chart type."""
         if self.current_data is None or self.current_data.empty:
-            return pn.pane.Markdown("No data to display")
+            return pn.pane.Markdown("## No data available\n\nClick **Load Data** to load market data.")
         
         # Filter data by time period
         filtered_data = self.data_manager.filter_by_time_interval(
@@ -137,7 +137,7 @@ class SimplePriceDashboard(BaseDashboard):
         )
         
         if filtered_data.empty:
-            return pn.pane.Markdown("No data available for selected time period")
+            return pn.pane.Markdown("## No data available\n\nNo data found for the selected time period.")
         
         # Create the chart based on type
         import plotly.graph_objects as go

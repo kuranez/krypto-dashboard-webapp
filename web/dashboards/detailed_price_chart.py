@@ -114,7 +114,7 @@ class DetailedPriceDashboard(BaseDashboard):
     def _create_price_chart(self):
         """Create the detailed price chart with technical indicators and volume."""
         if self.current_data is None or self.current_data.empty:
-            return pn.pane.Markdown("No data to display")
+            return pn.pane.Markdown("## No data available\n\nClick **Load Data** to load market data.")
         
         # Filter data by time period
         filtered_data = self.data_manager.filter_by_time_interval(
@@ -123,7 +123,7 @@ class DetailedPriceDashboard(BaseDashboard):
         )
         
         if filtered_data.empty:
-            return pn.pane.Markdown("No data available for selected time period")
+            return pn.pane.Markdown("## No data available\n\nNo data found for the selected time period.")
         
         # Calculate moving averages if not present
         df = filtered_data.copy()
@@ -342,7 +342,7 @@ class DetailedPriceDashboard(BaseDashboard):
     def _create_info_panel(self):
         """Create an information panel with current stats and indicators."""
         if self.current_data is None or self.current_data.empty:
-            return pn.pane.Markdown("No statistics available")
+            return pn.pane.Markdown("## No statistics available\n\nClick **Load Data** to load market data.")
         
         # Filter data by time period
         filtered_data = self.data_manager.filter_by_time_interval(
@@ -351,7 +351,7 @@ class DetailedPriceDashboard(BaseDashboard):
         )
         
         if filtered_data.empty:
-            return pn.pane.Markdown("No data available")
+            return pn.pane.Markdown("## No data available\n\nNo data found for the selected time period.")
         
         # Add technical indicators to DataFrame if not present
         if 'SMA_50' not in filtered_data.columns:

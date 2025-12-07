@@ -40,7 +40,7 @@ class DashboardApp(param.Parameterized):
         
         # Title
         title_pane = pn.pane.Markdown(
-            "Select a Dashboard",
+            "### Select a Dashboard",
             styles={'color': 'white', 'margin': '0px'},
             margin=(10, 20)
         )
