@@ -258,7 +258,7 @@ class SimplePriceDashboard(BaseDashboard):
             Select your preferred cryptocurrency and time period to view historical price trends.
             """,
             styles={
-                'font-size': '14px',
+                'font-size': '16px',
                 'background-color': '#f8f9fa',
                 'color': '#2c3e50',
                 'padding': '12px 20px',
