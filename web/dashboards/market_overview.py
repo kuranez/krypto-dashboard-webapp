@@ -72,11 +72,9 @@ class MarketOverviewDashboard(BaseDashboard):
             # First, load BTC data as reference
             df_btc = self.data_manager.fetch_combined_data('BTCUSDT')
             if not df_btc.empty:
-                # Filter outliers from price and volume data
-                df_btc = self.data_manager.filter_outliers_percentiles(df_btc, 'Volume', 1.0, 99.0)
-                df_btc = self.data_manager.filter_outliers_percentiles(df_btc, 'High', 0.5, 99.5)
-                df_btc = self.data_manager.filter_outliers_percentiles(df_btc, 'Low', 0.5, 99.5)
-                df_btc = self.data_manager.filter_outliers_percentiles(df_btc, 'Close', 0.5, 99.5)
+                # Filter false ATH spikes (data errors)
+                df_btc = self.data_manager.filter_price_spikes(df_btc, spike_threshold=4.0)
+                df_btc = df_btc.reset_index(drop=True)  # Reset index after filtering
                 df_btc['Symbol'] = 'BTC'
                 self.all_data['BTC'] = df_btc
                 self.ath_dict['BTC'] = df_btc['High'].max()
@@ -106,11 +104,9 @@ class MarketOverviewDashboard(BaseDashboard):
                 df = self.data_manager.fetch_combined_data(symbol_usdt)
                 
                 if not df.empty:
-                    # Filter outliers from price and volume data
-                    df = self.data_manager.filter_outliers_percentiles(df, 'Volume', 1.0, 99.0)
-                    df = self.data_manager.filter_outliers_percentiles(df, 'High', 0.5, 99.5)
-                    df = self.data_manager.filter_outliers_percentiles(df, 'Low', 0.5, 99.5)
-                    df = self.data_manager.filter_outliers_percentiles(df, 'Close', 0.5, 99.5)
+                    # Filter false ATH spikes (data errors)
+                    df = self.data_manager.filter_price_spikes(df, spike_threshold=4.0)
+                    df = df.reset_index(drop=True)  # Reset index after filtering
                     # Add symbol column
                     df['Symbol'] = symbol
                     self.all_data[symbol] = df
@@ -203,16 +199,10 @@ class MarketOverviewDashboard(BaseDashboard):
                 # Align correlation/beta series with price data by index
                 df_merged = df_symbol.copy()
                 
-                # Safely add correlation and beta, handling length mismatches
-                if len(self.correlation_series[symbol]) == len(df_symbol):
-                    df_merged['Correlation'] = self.correlation_series[symbol].values
-                else:
-                    df_merged['Correlation'] = pd.Series(self.correlation_series[symbol].values, index=df_merged.index)
-                
-                if len(self.beta_series[symbol]) == len(df_symbol):
-                    df_merged['Beta'] = self.beta_series[symbol].values
-                else:
-                    df_merged['Beta'] = pd.Series(self.beta_series[symbol].values, index=df_merged.index)
+                # Safely add correlation and beta using reindex to handle length mismatches
+                # This will add NaN for indices that don't exist in the correlation series
+                df_merged['Correlation'] = self.correlation_series[symbol].reindex(df_merged.index).fillna(0)
+                df_merged['Beta'] = self.beta_series[symbol].reindex(df_merged.index).fillna(0)
                 
                 # Create custom hover data array
                 customdata = df_merged[['Correlation', 'Beta']].values
@@ -389,9 +379,13 @@ class MarketOverviewDashboard(BaseDashboard):
                 
                 # Merge with dates and filter last 90 days
                 df_symbol = self.all_data[symbol]
+                
+                # Safely align correlation series with df_symbol using reindex
+                corr_aligned = corr_series.reindex(df_symbol.index).fillna(0)
+                
                 df_corr = pd.DataFrame({
                     'Date': df_symbol['Date'],
-                    'Correlation': corr_series.values if len(corr_series) == len(df_symbol) else None
+                    'Correlation': corr_aligned.values
                 })
                 df_corr = df_corr[df_corr['Date'] >= cutoff_date].dropna()
                 

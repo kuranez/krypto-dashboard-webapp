@@ -247,9 +247,52 @@ class DataManager:
         """Deprecated: Use add_technical_indicators() instead."""
         return self.add_technical_indicators(df)
     
+    def filter_price_spikes(self, df: pd.DataFrame, spike_threshold: float = 3.0) -> pd.DataFrame:
+        """Filter false ATH spikes using statistical anomaly detection.
+        
+        Removes data points where price deviates significantly from surrounding prices,
+        indicating a data error or flash crash rather than legitimate price movement.
+        
+        Args:
+            df: DataFrame with OHLC price data
+            spike_threshold: Number of standard deviations for spike detection (default: 3.0)
+                            Higher values = more conservative (fewer removals)
+        
+        Returns:
+            Filtered DataFrame with spike outliers removed
+            
+        Example:
+            # Remove extreme price spikes (likely data errors)
+            clean_df = data_manager.filter_price_spikes(df, spike_threshold=3.5)
+        """
+        if df.empty or 'High' not in df.columns:
+            return df
+        
+        df_clean = df.copy()
+        
+        # Calculate rolling statistics for High prices (30-period window)
+        window = min(30, len(df) // 10)  # Adaptive window size
+        if window < 3:
+            return df  # Not enough data for filtering
+        
+        rolling_median = df_clean['High'].rolling(window=window, center=True).median()
+        rolling_std = df_clean['High'].rolling(window=window, center=True).std()
+        
+        # Identify spikes: points that deviate more than threshold * std from median
+        deviation = abs(df_clean['High'] - rolling_median)
+        spike_mask = deviation > (spike_threshold * rolling_std)
+        
+        # Only filter if we're removing a small percentage of data
+        spike_count = spike_mask.sum()
+        if spike_count > 0 and spike_count < len(df) * 0.05:  # Max 5% removal
+            df_clean = df_clean[~spike_mask].copy()
+            print(f"Filtered {spike_count} price spikes (threshold: {spike_threshold} std deviations)")
+        
+        return df_clean
+    
     def filter_outliers_percentiles(self, df: pd.DataFrame, column_name: str, 
-                                   lower_percentile: float = 0.01, 
-                                   upper_percentile: float = 99.99) -> pd.DataFrame:
+                                   lower_percentile: float = 0.001, 
+                                   upper_percentile: float = 99.999) -> pd.DataFrame:
         """Filter outliers from a DataFrame column using percentile-based bounds.
         
         This method removes extreme outliers by filtering values outside the specified
@@ -258,8 +301,8 @@ class DataManager:
         Args:
             df: DataFrame to filter
             column_name: Name of the column to filter on
-            lower_percentile: Lower percentile threshold (default: 0.01 = bottom 0.01%)
-            upper_percentile: Upper percentile threshold (default: 99.99 = top 99.99%)
+            lower_percentile: Lower percentile threshold (default: 0.001 = bottom 0.001%)
+            upper_percentile: Upper percentile threshold (default: 99.999 = top 99.999%)
         
         Returns:
             Filtered DataFrame with outliers removed
