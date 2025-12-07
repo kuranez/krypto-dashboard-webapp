@@ -61,6 +61,7 @@ class FigureFactory:
         
         fig.update_layout(
             title_text=title or f"{symbol} Price Chart",
+            title_x=0.5,
             xaxis_title="Date",
             yaxis_title="Price (USD)",
             template=self.config.get_plotly_template(),
