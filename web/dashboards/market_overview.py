@@ -234,12 +234,12 @@ class MarketOverviewDashboard(BaseDashboard):
                     '<extra></extra>'
                 )
             
-            # Add price line with current and ATH in legend
+            # Add price line with current and ATH in legend, using green for current and red for ATH
             fig.add_trace(go.Scatter(
                 x=df_symbol['Date'],
                 y=df_symbol['Close'],
                 mode='lines',
-                name=f'{symbol} - Current: ${current_price:,.2f} | ATH: ${ath:,.2f}',
+                name=f'<b>{symbol}</b> - <b>Current: <span style="color:rgba(26,188,156,1.0)">${current_price:,.2f}</span></b> | <b>ATH: <span style="color:rgba(231,76,60,1.0)">${ath:,.2f}</span></b>',
                 legendgroup=symbol,
                 line=dict(color=self._convert_color(color_a, 0.8)),
                 fill='tozeroy',
@@ -421,62 +421,65 @@ class MarketOverviewDashboard(BaseDashboard):
             barmode='overlay',
             template=self.config.get_plotly_template(),
             showlegend=True,
+            hoverlabel=dict(font_size=12),
             legend=dict(
-                orientation="h",
-                yanchor="top",
-                y=1.15,
-                xanchor="center",
-                x=0.5,
-                bgcolor="rgba(255,255,255,0.9)",
-                bordercolor="rgba(71, 53, 106, 0.3)",
-                borderwidth=1,
-                font=dict(size=18),
-                title=dict(
-                    text="Select/deselect symbol by clicking on it",
-                    font=dict(size=14, color="#47356A"),
-                    side="top"
-                )
+            orientation="h",
+            yanchor="top",
+            y=1.2,
+            xanchor="center",
+            x=0.5,
+            bgcolor="rgba(255,255,255,0.9)",
+            bordercolor="rgba(71, 53, 106, 0.3)",
+            borderwidth=1,
+            font=dict(size=18),
+            title=dict(
+                text="<b>Select/deselect symbol by clicking on the text</b>",
+                font=dict(size=14, color="#47356A"),
+                side="top"
+            ),
+            itemsizing="constant",
+            tracegroupgap=15
             ),
             autosize=True,
             # height=1100,
-            margin=dict(l=30, r=30, t=100, b=100),
+            margin=dict(l=30, r=30, t=200, b=150),
             shapes=[
-                # Green zone - Strong coupling
-                dict(
-                    type="rect",
-                    xref="x3", yref="y3",
-                    x0=cutoff_date,
-                    x1=date_max,
-                    y0=0.7, y1=1.0,
-                    fillcolor="green",
-                    opacity=0.1,
-                    layer="below",
-                    line_width=0,
-                ),
-                # Yellow zone - Moderate correlation
-                dict(
-                    type="rect",
-                    xref="x3", yref="y3",
-                    x0=cutoff_date,
-                    x1=date_max,
-                    y0=0.3, y1=0.7,
-                    fillcolor="yellow",
-                    opacity=0.1,
-                    layer="below",
-                    line_width=0,
-                ),
-                # Red zone - Decoupling
-                dict(
-                    type="rect",
-                    xref="x3", yref="y3",
-                    x0=cutoff_date,
-                    x1=date_max,
-                    y0=-0.2, y1=0.3,
-                    fillcolor="red",
-                    opacity=0.1,
-                    layer="below",
-                    line_width=0,
-                ),
+            # Green zone - Strong coupling
+            dict(
+                type="rect",
+                xref="x3", yref="y3",
+                x0=cutoff_date,
+                x1=date_max,
+                y0=0.7, y1=1.0,
+                fillcolor="green",
+                opacity=0.1,
+                layer="below",
+                line_width=0,
+            ),
+            # Yellow zone - Moderate correlation
+            dict(
+                type="rect",
+                xref="x3", yref="y3",
+                x0=cutoff_date,
+                x1=date_max,
+                y0=0.3, y1=0.7,
+                fillcolor="yellow",
+                opacity=0.1,
+                layer="below",
+                line_width=0,
+            ),
+            # Red zone - Decoupling
+            dict(
+                type="rect",
+                xref="x3", yref="y3",
+                x0=cutoff_date,
+                x1=date_max,
+                y0=-0.2, y1=0.3,
+                fillcolor="red",
+                opacity=0.1,
+                layer="below",
+                line_width=0,
+            ),
             ],
         )
         

@@ -149,6 +149,11 @@ class SimplePriceDashboard(BaseDashboard):
                 self.current_symbol, 
                 title
             )
+            # Standardize font sizes
+            fig.update_layout(
+                title_font_size=18,
+                hoverlabel=dict(font_size=12)
+            )
         elif self.current_chart_type == 'Candlestick':
             fig = go.Figure(data=[go.Candlestick(
                 x=filtered_data['Date'],
@@ -159,6 +164,8 @@ class SimplePriceDashboard(BaseDashboard):
             )])
             fig.update_layout(
                 title=f"{self.current_symbol} Candlestick Chart ({self.current_period})",
+                title_font_size=18,
+                hoverlabel=dict(font_size=12),
                 xaxis_title="Date",
                 yaxis_title="Price (USD)",
                 template=self.config.get_plotly_template(),
@@ -174,6 +181,8 @@ class SimplePriceDashboard(BaseDashboard):
             )])
             fig.update_layout(
                 title=f"{self.current_symbol} Trading Volume ({self.current_period})",
+                title_font_size=18,
+                hoverlabel=dict(font_size=12),
                 xaxis_title="Date",
                 yaxis_title="Volume",
                 template=self.config.get_plotly_template(),

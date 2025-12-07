@@ -159,6 +159,13 @@ class DetailedPriceDashboard(BaseDashboard):
             subplot_titles=(f'{self.current_symbol} Price Chart ({self.current_period})', 'Trading Volume')
         )
         
+        # Update subplot title font sizes and move them down to create space for legend
+        for annotation in fig.layout.annotations:
+            annotation.update(
+                font=dict(size=18, color='#47356A'),
+                y=annotation.y - 0.03  # Move subtitle down to create space
+            )
+        
         # Price traces - High, Low, Close using crypto colors
         fig.add_trace(
             go.Scatter(
@@ -295,20 +302,32 @@ class DetailedPriceDashboard(BaseDashboard):
         fig.update_layout(
             template=self.config.get_plotly_template(),
             hovermode='x unified',
+            hoverlabel=dict(font_size=12),
             showlegend=True,
             legend=dict(
                 orientation="h",
                 yanchor="top",
-                y=-0.12,
+                y=1.15,
                 xanchor="center",
-                x=0.5
+                x=0.5,
+                bgcolor="rgba(255,255,255,0.9)",
+                bordercolor="rgba(71, 53, 106, 0.3)",
+                borderwidth=1,
+                font=dict(size=18),
+                title=dict(
+                    text="<b>Select/deselect indicator by clicking on the text</b>",
+                    font=dict(size=14, color="#47356A"),
+                    side="top"
+                ),
+                itemsizing="constant",
+                tracegroupgap=15
             ),
             xaxis2_title="Date",
             yaxis_title="Price (USD)",
             yaxis2_title="Volume",
             xaxis_rangeslider_visible=False,
             autosize=True,
-            margin=dict(l=50, r=50, t=80, b=50)
+            margin=dict(l=30, r=30, t=150, b=250)
         )
         
         # Update axes
@@ -479,7 +498,7 @@ class DetailedPriceDashboard(BaseDashboard):
         )
         
         # Create reactive panes that can be updated
-        self.chart_pane = pn.Column(sizing_mode='stretch_width', min_height=800)
+        self.chart_pane = pn.Column(sizing_mode='stretch_width', min_height=1200)
         self.info_pane = pn.Column(width=280, max_width=280, sizing_mode='fixed', margin=(0, 0, 0, 15))
 
         # Initialize with current data
