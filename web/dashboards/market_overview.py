@@ -442,7 +442,8 @@ class MarketOverviewDashboard(BaseDashboard):
             ),
             autosize=True,
             # height=1100,
-            margin=dict(l=30, r=30, t=200, b=150),
+            # Normalize chart padding while preserving space for multi-line titles and legend
+            margin=dict(l=24, r=24, t=140, b=160),
             shapes=[
             # Green zone - Strong coupling
             dict(
@@ -549,7 +550,7 @@ class MarketOverviewDashboard(BaseDashboard):
             **Quick Overview:** <br>
             <br>
             This dashboard provides comprehensive market analysis including historical price comparisons, 
-            volatility analysis through correlation and beta coefficients, trading ranges (90-day and 1-year), and BTC coupling dynamics. 
+            volatility analysis through correlation and beta coefficients, trading ranges (90-day and 1-year), and BTC coupling dynamics.<br> 
             Hover over charts for detailed metrics. <br>
             <br>
             *See bottom of page for detailed explanations.*

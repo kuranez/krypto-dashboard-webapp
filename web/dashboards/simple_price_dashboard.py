@@ -171,7 +171,8 @@ class SimplePriceDashboard(BaseDashboard):
                 template=self.config.get_plotly_template(),
                 xaxis_rangeslider_visible=True,
                 autosize=True,
-                margin=dict(l=50, r=50, t=50, b=50)
+                # Increase legend/title spacing (top/bottom)
+                margin=dict(l=24, r=24, t=140, b=180)
             )
         elif self.current_chart_type == 'Volume':
             fig = go.Figure(data=[go.Bar(
@@ -187,7 +188,8 @@ class SimplePriceDashboard(BaseDashboard):
                 yaxis_title="Volume",
                 template=self.config.get_plotly_template(),
                 autosize=True,
-                margin=dict(l=50, r=50, t=50, b=50)
+                # Increase legend/title spacing (top/bottom)
+                margin=dict(l=24, r=24, t=140, b=180)
             )
         
         return pn.pane.Plotly(fig, sizing_mode='stretch_both')

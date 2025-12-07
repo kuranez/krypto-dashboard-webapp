@@ -327,7 +327,8 @@ class DetailedPriceDashboard(BaseDashboard):
             yaxis2_title="Volume",
             xaxis_rangeslider_visible=False,
             autosize=True,
-            margin=dict(l=30, r=30, t=140, b=200)
+            # Normalize chart padding while preserving generous legend space
+            margin=dict(l=24, r=24, t=120, b=160)
         )
         
         # Update axes
