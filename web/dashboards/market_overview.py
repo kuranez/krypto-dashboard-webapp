@@ -428,8 +428,8 @@ class MarketOverviewDashboard(BaseDashboard):
                 xanchor="center",
                 x=0.5,
                 bgcolor="rgba(255,255,255,0.9)",
-                bordercolor="rgba(0,0,0,0)",
-                borderwidth=0,
+                bordercolor="rgba(71, 53, 106, 0.3)",
+                borderwidth=1,
                 font=dict(size=18),
                 title=dict(
                     text="Select/deselect symbol by clicking on it",
