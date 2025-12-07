@@ -432,10 +432,10 @@ class DetailedPriceDashboard(BaseDashboard):
                 'font-size': '16px',
                 'background-color': '#f8f9fa',
                 'color': '#2c3e50',
-                'padding': '12px 20px',
+                'padding': '12px',
                 'border-radius': '5px',
                 'border-left': f'4px solid {self.config.primary_color}',
-                'margin': '10px 0px'
+                'margin': '6px 0'
             },
             sizing_mode='stretch_width'
         )
@@ -483,7 +483,7 @@ class DetailedPriceDashboard(BaseDashboard):
                 'background-color': '#47356A',
                 'color': 'white',
                 'padding': '20px',
-                'border-radius': '5px',
+                'border-radius': '4px',
                 'margin-top': '10px'
             },
             sizing_mode='stretch_width'
@@ -494,12 +494,12 @@ class DetailedPriceDashboard(BaseDashboard):
             self.widgets['symbol_selector'],
             self.widgets['period_selector'],
             sizing_mode='stretch_width',
-            margin=(10, 0)
+            margin=(8, 0)
         )
         
         # Create reactive panes that can be updated
         self.chart_pane = pn.Column(sizing_mode='stretch_width', min_height=1200)
-        self.info_pane = pn.Column(width=280, max_width=280, sizing_mode='fixed', margin=(0, 0, 0, 15))
+        self.info_pane = pn.Column(width=280, max_width=280, sizing_mode='fixed', margin=(0, 0), styles={'padding': '12px'})
 
         # Initialize with current data
         self._update_display()
@@ -517,8 +517,10 @@ class DetailedPriceDashboard(BaseDashboard):
                 sizing_mode='stretch_width'
             ),
             explanation,
+            pn.layout.Divider(),
+            self._create_footer_row(),
             sizing_mode='stretch_width',
-            margin=(20, 20)
+            margin=(0, 0)
         )
         
         return layout
@@ -549,3 +551,5 @@ class DetailedPriceDashboard(BaseDashboard):
             'python-dotenv>=0.19.0',
             'matplotlib>=3.5.0'
         ]
+
+    # Footer is provided by BaseDashboard._create_footer_row()

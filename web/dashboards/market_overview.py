@@ -558,10 +558,10 @@ class MarketOverviewDashboard(BaseDashboard):
                 'font-size': '16px',
                 'background-color': '#f8f9fa',
                 'color': '#2c3e50',
-                'padding': '12px 20px',
+                'padding': '12px',
                 'border-radius': '5px',
                 'border-left': f'4px solid {self.config.primary_color}',
-                'margin': '10px 0px'
+                'margin': '6px 0'
             },
             sizing_mode='stretch_width'
         )
@@ -624,8 +624,10 @@ class MarketOverviewDashboard(BaseDashboard):
             pn.layout.Divider(),
             self.plot_pane,
             explanation_combined,
+            pn.layout.Divider(),
+            self._create_footer_row(),
             sizing_mode='stretch_width',
-            margin=(20, 20)
+            margin=(0, 0)
         )
         
         return layout
@@ -651,3 +653,5 @@ class MarketOverviewDashboard(BaseDashboard):
             'requests>=2.25.0',
             'matplotlib>=3.5.0'
         ]
+
+    # Footer is provided by BaseDashboard._create_footer_row()

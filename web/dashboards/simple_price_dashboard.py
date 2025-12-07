@@ -261,10 +261,10 @@ class SimplePriceDashboard(BaseDashboard):
                 'font-size': '16px',
                 'background-color': '#f8f9fa',
                 'color': '#2c3e50',
-                'padding': '12px 20px',
+                'padding': '12px',
                 'border-radius': '5px',
                 'border-left': f'4px solid {self.config.primary_color}',
-                'margin': '10px 0px'
+                'margin': '6px 0'
             },
             sizing_mode='stretch_width'
         )
@@ -275,12 +275,12 @@ class SimplePriceDashboard(BaseDashboard):
             self.widgets['period_selector'],
             # self.widgets['chart_type'],
             # sizing_mode='stretch_width',
-            margin=(10, 0)
+            margin=(8, 0)
         )
         
         # Create reactive panes that can be updated
         self.chart_pane = pn.Column(sizing_mode='stretch_both', min_height=500)
-        self.info_pane = pn.Column(width=300, sizing_mode='fixed')
+        self.info_pane = pn.Column(width=280, max_width=280, sizing_mode='fixed', styles={'padding': '12px'})
 
         # Initialize with current data
         self._update_display()
@@ -297,8 +297,10 @@ class SimplePriceDashboard(BaseDashboard):
                 self.info_pane,
                 sizing_mode='stretch_width'
             ),
+            pn.layout.Divider(),
+            self._create_footer_row(),
             sizing_mode='stretch_width',
-            margin=(20, 20)
+            margin=(0, 0)
         )
         
         return layout
@@ -329,3 +331,5 @@ class SimplePriceDashboard(BaseDashboard):
             'python-dotenv>=0.19.0',
             'matplotlib>=3.5.0'
         ]
+
+    # Footer is provided by BaseDashboard._create_footer_row()

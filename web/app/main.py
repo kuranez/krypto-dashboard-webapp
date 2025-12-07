@@ -74,7 +74,7 @@ class DashboardApp(param.Parameterized):
             self.dashboard_selector,
             self.load_data_button,
             sizing_mode='stretch_width',
-            styles={'background': self.config.primary_color, 'padding': '10px'},
+            styles={'background': self.config.primary_color, 'padding': '20px', 'border-radius': '4px'},
             height=70
         )
     
