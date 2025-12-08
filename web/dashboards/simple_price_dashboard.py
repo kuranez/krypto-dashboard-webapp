@@ -4,6 +4,9 @@ A basic dashboard showing just a price chart for one cryptocurrency.
 """
 
 import panel as pn
+from components.widgets import create_symbol_selector, create_period_selector, create_range_widgets
+from components.layouts import standard_margins
+from components.ui import create_header, create_summary_box
 from base_dashboard import BaseDashboard
 from data_manager import DataManager
 from figure_factory import FigureFactory
@@ -14,7 +17,7 @@ class SimplePriceDashboard(BaseDashboard):
     
     display_name = "Simple Price Chart"
     description = "Basic price chart for a single cryptocurrency"
-    version = "2.4"
+    version = "2.5"
     author = "kuranez"
     
     def __init__(self):
@@ -43,21 +46,9 @@ class SimplePriceDashboard(BaseDashboard):
     
     def _create_widgets(self):
         """Create the control widgets."""
-        self.widgets['symbol_selector'] = pn.widgets.Select(
-            name='Select Cryptocurrency',
-            options=self.available_symbols,
-            value=self.current_symbol,
-            width=200,
-            margin=(5, 10)
-        )
+        self.widgets['symbol_selector'] = create_symbol_selector(self.available_symbols, self.current_symbol)
         
-        self.widgets['period_selector'] = pn.widgets.Select(
-            name='Time Period',
-            options=self.available_periods,
-            value=self.current_period,
-            width=150,
-            margin=(5, 10)
-        )
+        self.widgets['period_selector'] = create_period_selector(self.available_periods, self.current_period)
         
         # self.widgets['chart_type'] = pn.widgets.Select(
         #     name='Chart Type',
@@ -68,14 +59,7 @@ class SimplePriceDashboard(BaseDashboard):
         # )
         
         # Index-based range slider for consistent precision
-        self.widgets['range_idx'] = pn.widgets.IntRangeSlider(
-            name='', start=0, end=1, value=(0, 1), step=1,
-            sizing_mode='stretch_width', margin=(5, 10), disabled=True,
-            show_value=False
-        )
-        self.widgets['range_label'] = pn.pane.Markdown(
-            "", sizing_mode='stretch_width', styles={'color': '#47356A', 'font-size': '20px'}, margin=(0, 5)
-        )
+        self.widgets['range_idx'], self.widgets['range_label'] = create_range_widgets()
         
         # Bind events
         self.widgets['symbol_selector'].param.watch(self._on_symbol_change, 'value')
@@ -93,18 +77,24 @@ class SimplePriceDashboard(BaseDashboard):
     def _on_period_change(self, event):
         """Handle time period change."""
         self.current_period = event.new
-        # Reset slider to match selected period
+        # Reset index-based slider to match selected period and update label
         if self.current_data is not None and not self.current_data.empty:
             try:
                 period_df = self.data_manager.filter_by_time_interval(self.current_data, self.current_period)
                 if not period_df.empty:
-                    start = period_df['Date'].min()
-                    end = period_df['Date'].max()
-                    # Constrain slider to the selected period bounds
-                    self.widgets['date_range'].start = start
-                    self.widgets['date_range'].end = end
-                    self.widgets['date_range'].value = (start, end)
-                    self.widgets['date_range'].disabled = False
+                    n = len(period_df)
+                    self.widgets['range_idx'].start = 0
+                    self.widgets['range_idx'].end = max(1, n - 1)
+                    self.widgets['range_idx'].value = (0, max(1, n - 1))
+                    self.widgets['range_idx'].disabled = False
+                    # Map full period indices to dates and update label immediately
+                    self._mapped_date_range = (period_df.iloc[0]['Date'], period_df.iloc[n - 1]['Date'])
+                    self.widgets['range_label'].object = f"#### Selected: {period_df.iloc[0]['Date']:%Y-%m-%d} → {period_df.iloc[n-1]['Date']:%Y-%m-%d}"
+                else:
+                    self.widgets['range_idx'].start = 0
+                    self.widgets['range_idx'].end = 1
+                    self.widgets['range_idx'].value = (0, 1)
+                    self.widgets['range_idx'].disabled = True
             except Exception:
                 pass
         if hasattr(self, 'chart_pane'):
@@ -222,8 +212,7 @@ class SimplePriceDashboard(BaseDashboard):
         if filtered_data.empty:
             return pn.pane.Markdown("## No data available\n\nNo data found for the selected time period.")
         
-        # Create the chart based on type
-        import plotly.graph_objects as go
+        # Create the chart based on type using FigureFactory
         
         if self.current_chart_type == 'Line':
             title = f"{self.current_symbol} Price Chart ({self.current_period})"
@@ -240,46 +229,19 @@ class SimplePriceDashboard(BaseDashboard):
             if x_range:
                 fig.update_xaxes(range=x_range)
         elif self.current_chart_type == 'Candlestick':
-            fig = go.Figure(data=[go.Candlestick(
-                x=filtered_data['Date'],
-                open=filtered_data['Open'],
-                high=filtered_data['High'],
-                low=filtered_data['Low'],
-                close=filtered_data['Close']
-            )])
-            fig.update_layout(
+            fig = self.figure_factory.create_candlestick(
+                filtered_data,
                 title=f"{self.current_symbol} Candlestick Chart ({self.current_period})",
-                title_font_size=18,
-                hoverlabel=dict(font_size=14),
-                xaxis_title="Date",
-                yaxis_title="Price (USD)",
-                template=self.config.get_plotly_template(),
-                xaxis_rangeslider_visible=True,
-                autosize=True,
-                # Increase legend/title spacing (top/bottom)
-                margin=dict(l=24, r=24, t=140, b=180)
+                x_range=x_range,
+                margins=standard_margins(140, 180)
             )
-            if x_range:
-                fig.update_xaxes(range=x_range)
         elif self.current_chart_type == 'Volume':
-            fig = go.Figure(data=[go.Bar(
-                x=filtered_data['Date'],
-                y=filtered_data['Volume'],
-                marker_color='#3498db'
-            )])
-            fig.update_layout(
+            fig = self.figure_factory.create_volume_only(
+                filtered_data,
                 title=f"{self.current_symbol} Trading Volume ({self.current_period})",
-                title_font_size=18,
-                hoverlabel=dict(font_size=14),
-                xaxis_title="Date",
-                yaxis_title="Volume",
-                template=self.config.get_plotly_template(),
-                autosize=True,
-                # Increase legend/title spacing (top/bottom)
-                margin=dict(l=24, r=24, t=140, b=180)
+                x_range=x_range,
+                margins=standard_margins(140, 180)
             )
-            if x_range:
-                fig.update_xaxes(range=x_range)
         
         return pn.pane.Plotly(fig, sizing_mode='stretch_both')
     
@@ -339,33 +301,17 @@ class SimplePriceDashboard(BaseDashboard):
         """Create and return the dashboard layout."""
         
         # Header
-        header = pn.pane.Markdown(
-            f"## {self.display_name}",
-            styles={
-                'font-size': '24px', 
-                'color': self.config.primary_color,
-                'text-align': 'center'
-            }
-        )
+        header = create_header(self.display_name, self.config.primary_color)
         
         # Quick summary box
-        summary_box = pn.pane.Markdown(
+        summary_box = create_summary_box(
             """
             **Quick Overview:** <br>
             <br>
             Track individual cryptocurrency price movements over time.
             Select your preferred cryptocurrency and time period to view historical price trends.
             """,
-            styles={
-                'font-size': '16px',
-                'background-color': '#f8f9fa',
-                'color': '#2c3e50',
-                'padding': '12px',
-                'border-radius': '5px',
-                'border-left': f'4px solid {self.config.primary_color}',
-                'margin': '6px 0'
-            },
-            sizing_mode='stretch_width'
+            self.config.primary_color
         )
         
         # Controls: first row (selectors + range label), second row (slider)

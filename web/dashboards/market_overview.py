@@ -10,13 +10,15 @@ import pandas as pd
 from base_dashboard import BaseDashboard
 from data_manager import DataManager
 from config import AppConfig
+from components.explanations import market_coupling_explanation
+from components.layouts import plotly_legend_config, standard_margins
 
 class MarketOverviewDashboard(BaseDashboard):
     """Market overview dashboard for multiple cryptocurrencies."""
     
     display_name = "Market Overview"
     description = "Market overview with current vs ATH and price comparison"
-    version = "2.4"
+    version = "2.5"
     author = "kuranez"
     
     def __init__(self):
@@ -422,28 +424,9 @@ class MarketOverviewDashboard(BaseDashboard):
             template=self.config.get_plotly_template(),
             showlegend=True,
             hoverlabel=dict(font_size=14),
-            legend=dict(
-            orientation="h",
-            yanchor="top",
-            y=1.2,
-            xanchor="center",
-            x=0.5,
-            bgcolor="rgba(255,255,255,0.9)",
-            bordercolor="rgba(71, 53, 106, 0.3)",
-            borderwidth=1,
-            font=dict(size=18),
-            title=dict(
-                text="<b>Select/deselect symbol by clicking on the text</b>",
-                font=dict(size=14, color="#47356A"),
-                side="top"
-            ),
-            itemsizing="constant",
-            tracegroupgap=15
-            ),
+            legend=plotly_legend_config("<b>Select/deselect symbol by clicking on the text</b>"),
             autosize=True,
-            # height=1100,
-            # Normalize chart padding while preserving space for multi-line titles and legend
-            margin=dict(l=24, r=24, t=140, b=160),
+            margin=standard_margins(140, 160),
             shapes=[
             # Green zone - Strong coupling
             dict(
@@ -568,49 +551,7 @@ class MarketOverviewDashboard(BaseDashboard):
         )
         
         # Explanation text for correlation and beta
-        explanation_combined = pn.pane.Markdown(
-            """
-            ## Market Coupling Analysis
-            
-            This dashboard analyzes how altcoins correlate with Bitcoin over time.
-            
-            **Chart Descriptions:**
-            - **Price Chart (Top Left)**: Hover to see historical 30-day rolling correlation and beta at any point in time
-            - **Current Price vs ATH Chart (Top Right)**: Visualizes how close each cryptocurrency is to its all-time high price
-             and shows recent 90-day and 1-year trading ranges
-            - **Correlation Chart (Bottom)**: Shows recent 90-day correlation trends with color-coded zones:
-              - 🟢 **Green (> 0.7)**: Strong coupling - altcoin moves together with BTC
-              - 🟡 **Yellow (0.3 - 0.7)**: Moderate correlation
-              - 🔴 **Red (< 0.3)**: Decoupling - altcoin moves independently from BTC
-            
-            ---
-            
-            **Understanding the Metrics:**
-            
-            **30d Correlation (Pearson):** Measures price movement similarity with BTC over 30 days
-            - **> 0.7**: Strong coupling (moves together with BTC)
-            - **0.3 - 0.7**: Moderate correlation
-            - **< 0.3**: Decoupling (moves independently from BTC)
-            - **Range**: -1 (opposite direction) to +1 (same direction)
-            
-            **30d Beta Coefficient:** Measures volatility relative to BTC movements
-            - **Beta > 1**: More volatile than BTC (amplified movements)
-            - **Beta = 1**: Moves in line with BTC
-            - **Beta < 1**: Less volatile than BTC
-            - **Beta < 0**: Moves opposite to BTC
-            
-            *Example: A beta of 1.5 means the asset moves 50% more than BTC in the same direction*
-            """,
-            styles={
-                'font-size': '16px',
-                'background-color': '#47356A',
-                'color': 'white',
-                'padding': '20px',
-                'border-radius': '5px',
-                'margin-top': '10px'
-            },
-            sizing_mode='stretch_width'
-        )
+        explanation_combined = market_coupling_explanation()
         
         # Create reactive pane for combined plot
         self.plot_pane = pn.Column(sizing_mode='stretch_both', min_height=1200)

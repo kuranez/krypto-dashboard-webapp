@@ -101,12 +101,24 @@ web/
 │   ├── figure_factory.py         # Chart creation
 │   ├── config.py                 # Configuration
 │   └── requirements.txt          # Dependencies
+│ 
+├── components/
+│   ├── explanations.py           # Outsource info texts here
+│   ├── layouts.py                # Shared layout elements
+│   ├── ui.py                     # Shared ui elements
+│   └── widgets.py                # Shared widgets
+│ 
 ├── dashboards/
 │   ├── simple_price_dashboard.py # Basic price chart
 │   ├── detailed_price_chart.py   # Detailed analysis
 │   └── market_overview.py        # Market overview
+│ 
 └── assets/
-    └── logo.png                   # Application logo
+│  └── logo.png                   # Application logo
+│ 
+├── testing/
+│   ├── conftest.py               # Pytest configuration file
+    └── test_correlation.py       # Test correlation calculations 
 ```
 
 ## 💡 Creating New Dashboards
@@ -207,10 +219,11 @@ Or set in Plesk Docker stack environment settings.
 
 ### Common Issues
 
-1. **Import Errors**: Ensure dependencies installed: `pip install -r web/requirements.txt`
-2. **Port Conflicts**: Local dev uses port 5007, Docker uses 5013
-3. **404 Errors on Server**: Verify nginx reverse proxy configuration
-4. **WebSocket Errors**: Check `Upgrade` and `Connection` headers in proxy config
+1. **Import Errors**: Ensure dependencies installed: `pip install -r web/requirements.txt`.
+2. **Port Conflicts**: The local development server uses port 5007 (with 5008 as a fallback), while the Docker container uses port 5013.
+These port numbers can be modified in `launch.py` for local development or in the respective Docker files for the containerized setup. 
+3. **404 Errors on Server**: Verify nginx reverse proxy configuration.
+4. **WebSocket Errors**: Check `Upgrade` and `Connection` headers in proxy config.
 
 For detailed troubleshooting and deployment guides, see the [docs/](docs/) directory.
 

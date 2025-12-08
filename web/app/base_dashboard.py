@@ -13,7 +13,7 @@ class BaseDashboard(ABC):
     # Class attributes that can be overridden by subclasses
     display_name: str = "Base Dashboard"
     description: str = "Base dashboard class"
-    version: str = "2.4"
+    version: str = "2.5"
     author: str = "kuranez"
     
     def __init__(self):
@@ -79,7 +79,7 @@ class BaseDashboard(ABC):
         footer_text = f"""
         <div style="text-align: center; background-color: #008080; color: white; padding: 20px; border-radius: 4px;">
         <a href="https://github.com/kuranez/" target="_blank"><img src="data:image/png;base64,{logo_data}" alt="GitHub" width="32"></a><br>
-        <b>Created by <a href="https://github.com/kuranez/" style="color: white; text-decoration: none;">kuranez</a> | Version 2.4</b><br>
+        <b>Created by <a href="https://github.com/kuranez/" style="color: white; text-decoration: none;">kuranez</a> | Version 2.5</b><br>
         <b><a href="https://github.com/kuranez/krypto-dashboard-webapp" style="color: white; text-decoration: none;">🌐 Web Version</a> | 
         <a href="https://github.com/kuranez/krypto-dashboard" style="color: white; text-decoration: none;">📙 Jupyter Notebook Version</a></b>
         <br><br>

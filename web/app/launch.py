@@ -7,9 +7,11 @@ For production deployment, use: panel serve main.py --prefix /krypto-dashboard
 import sys
 from pathlib import Path
 
-# Add the current directory to Python path
+# Add the current app directory and the web root to Python path
 current_dir = Path(__file__).parent
+web_root = current_dir.parent
 sys.path.insert(0, str(current_dir))
+sys.path.insert(0, str(web_root))
 
 def main():
     """Launch the dashboard application for local development."""
@@ -21,16 +23,17 @@ def main():
         print("🔗 Access URL: http://localhost:5007")
         print("⏹️  Press Ctrl+C to stop the server")
         
-        try:
-            app.show(port=5007, autoreload=True)
-        except OSError as e:
-            if "Address already in use" in str(e):
-                print("\n⚠️  Port 5007 is already in use!")
-                print("💡 Either:")
-                print("   1. Stop the existing server (Ctrl+C in that terminal)")
-                print("   2. Or use a different port:")
-                print("      python -c \"import sys; sys.path.insert(0, 'app'); from main import app; app.show(port=5008)\"")
-            raise
+        # Try default port, then fallback automatically to 5008
+        for port in (5007, 5008):
+            try:
+                print(f"🔌 Attempting to start on port {port}...")
+                app.show(port=port, autoreload=True)
+                break
+            except OSError as e:
+                if "Address already in use" in str(e):
+                    print(f"\n⚠️  Port {port} is already in use! Trying next...")
+                    continue
+                raise
         
     except ImportError as e:
         print(f"❌ Error importing modules: {e}")
