@@ -7,11 +7,12 @@ For production deployment, use: panel serve main.py --prefix /krypto-dashboard
 import sys
 from pathlib import Path
 
-# Add the current app directory and the web root to Python path
+# Add the current app directory and the web root to Python path safely
 current_dir = Path(__file__).parent
 web_root = current_dir.parent
-sys.path.insert(0, str(current_dir))
-sys.path.insert(0, str(web_root))
+for p in (str(current_dir), str(web_root)):
+    if p not in sys.path:
+        sys.path.append(p)
 
 def main():
     """Launch the dashboard application for local development."""
