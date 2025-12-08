@@ -13,6 +13,7 @@ _app_dir = Path(__file__).parent
 for p in (str(_app_dir), str(_app_dir.parent)):
     if p not in sys.path:
         sys.path.append(p)
+        
 from dashboard_registry import DashboardRegistry
 from config import AppConfig
 
