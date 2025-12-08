@@ -19,6 +19,7 @@ RUN groupadd -g 1003 psacln && useradd -u 10000 -g 1003 -m webadmin
 COPY web/app ./app
 COPY web/assets ./assets
 COPY web/dashboards ./dashboards
+COPY web/components ./components
 
 # Set permissions for the app files for Plesk compatibility
 RUN chown -R webadmin:psacln /app
