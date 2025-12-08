@@ -4,6 +4,7 @@ Manages discovery and loading of dashboard modules.
 """
 
 import importlib.util
+import sys
 import inspect
 from pathlib import Path
 from typing import Dict, Type
@@ -41,6 +42,13 @@ class DashboardRegistry:
     def _load_dashboard_module(self, file_path: Path):
         """Load a dashboard module and extract dashboard classes."""
         module_name = file_path.stem
+        
+        # Ensure the app directory is on sys.path so dashboards can import shared modules
+        app_dir = Path(__file__).parent
+        app_root = app_dir.parent  # parent of app_dir contains dashboards
+        for p in (str(app_dir), str(app_root)):
+            if p not in sys.path:
+                sys.path.append(p)
         
         # Load the module
         spec = importlib.util.spec_from_file_location(module_name, file_path)
