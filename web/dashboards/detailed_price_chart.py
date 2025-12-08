@@ -16,7 +16,7 @@ class DetailedPriceDashboard(BaseDashboard):
     
     display_name = "Detailed Price Chart"
     description = "Detailed price chart with SMA/EMA indicators and volume"
-    version = "2.3"
+    version = "2.4"
     author = "kuranez"
     
     def __init__(self):
@@ -59,10 +59,28 @@ class DetailedPriceDashboard(BaseDashboard):
             width=150,
             margin=(5, 10)
         )
+
+        # Index-based range slider (1 step = 1 day equivalent)
+        self.widgets['range_idx'] = pn.widgets.IntRangeSlider(
+            name='',
+            start=0,
+            end=1,
+            value=(0, 1),
+            step=1,
+            sizing_mode='stretch_width',
+            margin=(5, 10),
+            disabled=True,
+            show_value=False
+        )
+        # Label showing mapped dates
+        self.widgets['range_label'] = pn.pane.Markdown(
+            "", sizing_mode='stretch_width', styles={'color': '#47356A', 'font-size': '20px'}, margin=(0, 5)
+        )
         
         # Bind events
         self.widgets['symbol_selector'].param.watch(self._on_symbol_change, 'value')
         self.widgets['period_selector'].param.watch(self._on_period_change, 'value')
+        self.widgets['range_idx'].param.watch(self._on_range_idx_change, 'value')
     
     def _on_symbol_change(self, event):
         """Handle symbol change."""
@@ -74,6 +92,42 @@ class DetailedPriceDashboard(BaseDashboard):
     def _on_period_change(self, event):
         """Handle time period change."""
         self.current_period = event.new
+        # Reset index-based slider to match selected period
+        if self.current_data is not None and not self.current_data.empty:
+            try:
+                period_df = self.data_manager.filter_by_time_interval(self.current_data, self.current_period)
+                if not period_df.empty:
+                    n = len(period_df)
+                    self.widgets['range_idx'].start = 0
+                    self.widgets['range_idx'].end = max(1, n - 1)
+                    self.widgets['range_idx'].value = (0, max(1, n - 1))
+                    self.widgets['range_idx'].disabled = False
+                    # Update mapped range and label
+                    self._mapped_date_range = (period_df.iloc[0]['Date'], period_df.iloc[n - 1]['Date'])
+                    self.widgets['range_label'].object = f"**Selected:** {period_df.iloc[0]['Date']:%Y-%m-%d} → {period_df.iloc[n-1]['Date']:%Y-%m-%d}"
+            except Exception:
+                pass
+        if hasattr(self, 'chart_pane'):
+            self._update_display()
+    
+    def _on_range_idx_change(self, event):
+        """Handle index range slider change: map indices to dates and update chart."""
+        try:
+            df_period = self.data_manager.filter_by_time_interval(self.current_data, self.current_period)
+            if df_period is not None and not df_period.empty:
+                i_start, i_end = event.new
+                i_start = max(0, min(i_start, len(df_period) - 1))
+                i_end = max(0, min(i_end, len(df_period) - 1))
+                if i_start > i_end:
+                    i_start, i_end = i_end, i_start
+                start_date = df_period.iloc[i_start]['Date']
+                end_date = df_period.iloc[i_end]['Date']
+                # Update label
+                self.widgets['range_label'].object = f"#### Selected: {start_date:%Y-%m-%d} → {end_date:%Y-%m-%d}"
+                # Store mapped dates to use in chart creation
+                self._mapped_date_range = (start_date, end_date)
+        except Exception:
+            pass
         if hasattr(self, 'chart_pane'):
             self._update_display()
         
@@ -110,6 +164,33 @@ class DetailedPriceDashboard(BaseDashboard):
         except Exception as e:
             print(f"Error loading data: {e}")
             self.current_data = None
+        
+        # Initialize index range slider when data is available
+        if self.current_data is not None and not self.current_data.empty:
+            date_min = self.current_data['Date'].min()
+            date_max = self.current_data['Date'].max()
+            # Constrain slider to current period bounds by default
+            try:
+                period_df = self.data_manager.filter_by_time_interval(self.current_data, self.current_period)
+                if not period_df.empty:
+                    n = len(period_df)
+                    self.widgets['range_idx'].start = 0
+                    self.widgets['range_idx'].end = max(1, n - 1)
+                    self.widgets['range_idx'].value = (0, max(1, n - 1))
+                    self.widgets['range_idx'].disabled = False
+                    # Set initial label and mapped range
+                    self._mapped_date_range = (period_df.iloc[0]['Date'], period_df.iloc[n - 1]['Date'])
+                    self.widgets['range_label'].object = f"#### Selected: {period_df.iloc[0]['Date']:%Y-%m-%d} → {period_df.iloc[n-1]['Date']:%Y-%m-%d}"
+                else:
+                    self.widgets['range_idx'].start = 0
+                    self.widgets['range_idx'].end = 1
+                    self.widgets['range_idx'].value = (0, 1)
+                    self.widgets['range_idx'].disabled = True
+            except Exception:
+                self.widgets['range_idx'].start = 0
+                self.widgets['range_idx'].end = 1
+                self.widgets['range_idx'].value = (0, 1)
+                self.widgets['range_idx'].disabled = True
     
     def _create_price_chart(self):
         """Create the detailed price chart with technical indicators and volume."""
@@ -121,6 +202,18 @@ class DetailedPriceDashboard(BaseDashboard):
             self.current_data, 
             self.current_period
         )
+        
+        # Apply mapped index-based date range if present
+        if hasattr(self, '_mapped_date_range') and self._mapped_date_range:
+            start_date, end_date = self._mapped_date_range
+            try:
+                filtered_data = filtered_data[(filtered_data['Date'] >= start_date) & (filtered_data['Date'] <= end_date)]
+                if filtered_data.empty:
+                    return pn.pane.Markdown("## No data available\n\nNo data found for the selected date range.")
+            except Exception:
+                pass
+        
+        # Remove legacy date_range filtering; index-mapped range is the source of truth
         
         if filtered_data.empty:
             return pn.pane.Markdown("## No data available\n\nNo data found for the selected time period.")
@@ -331,6 +424,10 @@ class DetailedPriceDashboard(BaseDashboard):
             margin=dict(l=24, r=24, t=120, b=160)
         )
         
+        # Ensure plotted x-axis reflects selected date range
+        if hasattr(self, '_mapped_date_range') and self._mapped_date_range:
+            fig.update_xaxes(range=self._mapped_date_range)
+        
         # Update axes
         fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128, 128, 128, 0.2)')
         fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128, 128, 128, 0.2)')
@@ -353,6 +450,16 @@ class DetailedPriceDashboard(BaseDashboard):
         
         if filtered_data.empty:
             return pn.pane.Markdown("## No data available\n\nNo data found for the selected time period.")
+        
+        # Apply mapped index-based date range if set
+        if hasattr(self, '_mapped_date_range') and self._mapped_date_range:
+            start_date, end_date = self._mapped_date_range
+            try:
+                filtered_data = filtered_data[(filtered_data['Date'] >= start_date) & (filtered_data['Date'] <= end_date)]
+                if filtered_data.empty:
+                    return pn.pane.Markdown("## No data available\n\nNo data found for the selected date range.")
+            except Exception:
+                pass
         
         # Add technical indicators to DataFrame if not present
         if 'SMA_50' not in filtered_data.columns:
@@ -490,10 +597,18 @@ class DetailedPriceDashboard(BaseDashboard):
             sizing_mode='stretch_width'
         )
         
-        # Controls row
-        controls = pn.Row(
-            self.widgets['symbol_selector'],
-            self.widgets['period_selector'],
+        # Controls row split into two lines: selectors+label, then slider
+        controls = pn.Column(
+            pn.Row(
+                self.widgets['symbol_selector'],
+                self.widgets['period_selector'],
+                self.widgets['range_label'],
+                sizing_mode='stretch_width'
+            ),
+            pn.Row(
+                self.widgets['range_idx'],
+                sizing_mode='stretch_width'
+            ),
             sizing_mode='stretch_width',
             margin=(8, 0)
         )
@@ -530,7 +645,40 @@ class DetailedPriceDashboard(BaseDashboard):
         """Update the chart and info panels."""
         # Clear and update chart
         self.chart_pane.clear()
-        self.chart_pane.append(self._create_price_chart())
+        plotly_pane = self._create_price_chart()
+        self.chart_pane.append(plotly_pane)
+        
+        # Link Plotly relayout (zoom/pan) back to index-mapped range/label
+        try:
+            if hasattr(self, '_relayout_watcher') and self._relayout_watcher is not None:
+                plotly_pane.param.unwatch(self._relayout_watcher)
+                self._relayout_watcher = None
+            
+            def _on_relayout(event):
+                data = event.new or {}
+                start = None
+                end = None
+                if 'xaxis.range[0]' in data and 'xaxis.range[1]' in data:
+                    start = data.get('xaxis.range[0]')
+                    end = data.get('xaxis.range[1]')
+                else:
+                    rng = data.get('xaxis.range')
+                    if isinstance(rng, (list, tuple)) and len(rng) == 2:
+                        start, end = rng
+                if start and end:
+                    try:
+                        import pandas as _pd
+                        s = _pd.to_datetime(start).date()
+                        e = _pd.to_datetime(end).date()
+                        # Update mapped range and label
+                        self._mapped_date_range = (s, e)
+                        self.widgets['range_label'].object = f"#### Selected: {s:%Y-%m-%d} → {e:%Y-%m-%d}"
+                    except Exception:
+                        pass
+            
+            self._relayout_watcher = plotly_pane.param.watch(_on_relayout, 'relayout_data')
+        except Exception:
+            pass
         
         # Clear and update info
         self.info_pane.clear()

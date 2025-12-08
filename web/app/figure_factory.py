@@ -70,7 +70,7 @@ class FigureFactory:
                 range=[price_min - price_range * 0.1, price_max + price_range * 0.1]
             ),
             xaxis=dict(
-                rangeslider=dict(visible=True, thickness=0.05),
+                rangeslider=dict(visible=False, thickness=0.05),
                 type='date'
             ),
             autosize=True,
