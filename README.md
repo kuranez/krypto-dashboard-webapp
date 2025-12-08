@@ -102,22 +102,22 @@ web/
 │   ├── config.py                 # Configuration
 │   └── requirements.txt          # Dependencies
 │ 
-├── components/
-│   ├── explanations.py           # Outsource info texts here
-│   ├── layouts.py                # Shared layout elements
-│   ├── ui.py                     # Shared ui elements
-│   └── widgets.py                # Shared widgets
-│ 
 ├── dashboards/
 │   ├── simple_price_dashboard.py # Basic price chart
 │   ├── detailed_price_chart.py   # Detailed analysis
 │   └── market_overview.py        # Market overview
 │ 
-└── assets/
+├── components/
+│   ├── explanations.py           # Dashboard info texts
+│   ├── layouts.py                # Shared layout elements
+│   ├── ui.py                     # Shared ui elements
+│   └── widgets.py                # Shared widgets
+│ 
+├── assets/
 │  └── logo.png                   # Application logo
 │ 
-├── testing/
-│   ├── conftest.py               # Pytest configuration file
+└──testing/
+    ├── conftest.py               # Pytest configuration file
     └── test_correlation.py       # Test correlation calculations 
 ```
 
