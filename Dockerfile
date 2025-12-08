@@ -15,11 +15,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Create user and group
 RUN groupadd -g 1003 psacln && useradd -u 10000 -g 1003 -m webadmin
 
-# Copy the main app code
+# Copy shared components first (imported as `components.*`)
+COPY web/components ./components
+
+# Copy the main app code and dashboards
 COPY web/app ./app
-COPY web/app/components ./components
-COPY web/assets ./assets
 COPY web/dashboards ./dashboards
+COPY web/assets ./assets
 
 # Set permissions for the app files for Plesk compatibility
 RUN chown -R webadmin:psacln /app
