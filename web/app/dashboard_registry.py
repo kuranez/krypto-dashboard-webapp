@@ -46,9 +46,9 @@ class DashboardRegistry:
         # Ensure the app directory is on sys.path so dashboards can import shared modules
         app_dir = Path(__file__).parent
         app_root = app_dir.parent  # parent of app_dir contains dashboards
-        for p in (str(app_dir), str(app_root)):
+        for p in (str(app_root), str(app_dir)):
             if p not in sys.path:
-                sys.path.append(p)
+                sys.path.insert(0, p)
         
         # Load the module
         spec = importlib.util.spec_from_file_location(module_name, file_path)
