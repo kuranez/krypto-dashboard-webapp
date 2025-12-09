@@ -4,10 +4,11 @@ Manages discovery and loading of dashboard modules.
 """
 
 import importlib.util
-import sys
 import inspect
+import sys
 from pathlib import Path
 from typing import Dict, Type
+
 from base_dashboard import BaseDashboard
 
 class DashboardRegistry:

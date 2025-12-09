@@ -8,10 +8,34 @@ class AppConfig:
     
     def __init__(self):
         
-        # Color scheme
+        # Supported cryptocurrency symbols
+        self.available_symbols = [
+            'BTC', 'ETH', 'BNB', 'TRX', 'SOL',
+            'ADA', 'DOT', 'UNI', 'XRP', 'XLM',
+            'LINK', 'LTC', 'DOGE', 'SHIB', 'HBAR'
+        ]
+
+        # Color scheme for the application
         self.accent_color = "teal"
-        self.primary_color = "#47356A"
-        self.secondary_color = "#20B2AA"
+
+        self.primary_color = "#47356A"  # Main purple
+        self.secondary_color = "#20B2AA"  # Teal
+        self.tertiary_color = "#008080"  # Dark teal
+
+        self.primary_text_color = "#47356A"
+        self.secondary_text_color = "#2c3e50"
+
+        self.red_color = "#e74c3c"  # Used for negative/alert
+        self.green_color = "#1abc9c"  # Used for positive/success
+        self.orange_color = "#f39c12"  # Used for warning/highlight
+        self.blue_color = "#3498db"  # Used for info/volume
+        self.gold_color = "#ffd700"  # Used for gold/secondary
+        self.gray_color = "#808080"  # Used for grid/neutral
+        self.light_gray_color = "#f8f9fa"  # Used for backgrounds
+        self.background_color = "#ffebee"  # Used for error/info backgrounds
+        self.white_color = "#ffffff"
+        self.black_color = "#000000"
+
         
         # Component styling
         self.styles = {
@@ -21,9 +45,6 @@ class AppConfig:
             "font-size": "18px",
         }
         
-        # Layout settings
-        # self.sidebar_width = 280
-        # self.plot_height = 500
         
         # Cryptocurrency colors for consistency
         self.crypto_colors = {

@@ -3,19 +3,20 @@ Main Dashboard Application
 HoloViz Panel-based cryptocurrency dashboard with modular dashboard support.
 """
 
-import panel as pn
-import param
 from pathlib import Path
 import sys
+
+import panel as pn
+import param
+
+from config import AppConfig
+from dashboard_registry import DashboardRegistry
 
 # Ensure app directory is on sys.path so 'components' and other subpackages import reliably
 _app_dir = Path(__file__).parent
 for p in (str(_app_dir), str(_app_dir.parent)):
     if p not in sys.path:
         sys.path.append(p)
-        
-from dashboard_registry import DashboardRegistry
-from config import AppConfig
 
 pn.extension('plotly')
 
@@ -29,14 +30,10 @@ class DashboardApp(param.Parameterized):
         self.config = AppConfig()
         self.registry = DashboardRegistry()
         self.current_dashboard_instance = None
-        
-        # Discover available dashboards
         self.registry.discover_dashboards()
-        
         # Create UI components
         self._create_main_area()
         self._create_header()
-        
         # Load initial dashboard
         dashboard_names = list(self.registry.get_available_dashboards().keys())
         if dashboard_names:

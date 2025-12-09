@@ -4,20 +4,21 @@ A basic dashboard showing just a price chart for one cryptocurrency.
 """
 
 import panel as pn
-from components.widgets import create_symbol_selector, create_period_selector, create_range_widgets
+
+from base_dashboard import BaseDashboard
 from components.layouts import standard_margins
 from components.ui import create_header, create_summary_box
-from base_dashboard import BaseDashboard
+from components.widgets import create_period_selector, create_range_widgets, create_symbol_selector
+from config import AppConfig
 from data_manager import DataManager
 from figure_factory import FigureFactory
-from config import AppConfig
 
 class SimplePriceDashboard(BaseDashboard):
     """Simple dashboard with one price chart for one symbol."""
     
     display_name = "Simple Price Chart"
     description = "Basic price chart for a single cryptocurrency"
-    version = "2.5"
+    version = "2.6"
     author = "kuranez"
     
     def __init__(self):
@@ -32,7 +33,7 @@ class SimplePriceDashboard(BaseDashboard):
         self.current_chart_type = 'Line'
         
         # Available options
-        self.available_symbols = ['BTC', 'ETH', 'BNB', 'TRX', 'SOL', 'ADA', 'DOT', 'UNI', 'XRP', 'XLM', 'LINK', 'LTC', 'DOGE', 'SHIB', 'HBAR']
+        self.available_symbols = self.config.available_symbols
         self.available_periods = list(self.config.time_intervals.keys())
         
         # Data storage
@@ -332,7 +333,7 @@ class SimplePriceDashboard(BaseDashboard):
         
         # Create reactive panes that can be updated
         self.chart_pane = pn.Column(sizing_mode='stretch_both', min_height=500)
-        self.info_pane = pn.Column(width=280, max_width=280, sizing_mode='fixed', styles={'padding': '12px'})
+        self.info_pane = pn.Column(width=280, max_width=280, sizing_mode='fixed', styles={'padding': '12px', 'background-color': self.config.light_gray_color, 'color': self.config.secondary_text_color})
 
         # Initialize with current data
         self._update_display()

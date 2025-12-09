@@ -6,14 +6,16 @@ A detailed dashboard showing price chart with technical indicators and volume.
 import panel as pn
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from components.widgets import create_symbol_selector, create_period_selector, create_range_widgets
+
 from base_dashboard import BaseDashboard
+from config import AppConfig
 from data_manager import DataManager
 from figure_factory import FigureFactory
-from config import AppConfig
-from components.ui import create_header, create_summary_box
+
 from components.explanations import technical_analysis_guide
 from components.layouts import plotly_legend_config, standard_margins
+from components.ui import create_header, create_summary_box
+from components.widgets import create_symbol_selector, create_period_selector, create_range_widgets
 
 
 class DetailedPriceDashboard(BaseDashboard):
@@ -21,7 +23,7 @@ class DetailedPriceDashboard(BaseDashboard):
     
     display_name = "Detailed Price Chart"
     description = "Detailed price chart with SMA/EMA indicators and volume"
-    version = "2.5"
+    version = "2.6"
     author = "kuranez"
     
     def __init__(self):
@@ -35,7 +37,7 @@ class DetailedPriceDashboard(BaseDashboard):
         self.current_period = '1Y'
         
         # Available options
-        self.available_symbols = ['BTC', 'ETH', 'BNB', 'TRX', 'SOL', 'ADA', 'DOT', 'UNI', 'XRP', 'XLM', 'LINK', 'LTC', 'DOGE', 'SHIB', 'HBAR']
+        self.available_symbols = self.config.available_symbols
         self.available_periods = list(self.config.time_intervals.keys())
         
         # Data storage
@@ -166,12 +168,15 @@ class DetailedPriceDashboard(BaseDashboard):
                 pass
         if filtered_data.empty:
             return pn.pane.Markdown("## No data available\n\nNo data found for the selected time period.")
+        # Use legend border color from config (primary_color = #47356A)
+        legend_config = plotly_legend_config("<b>Select/deselect indicator by clicking on the text</b>")
+        legend_config['bordercolor'] = self.config.primary_color
         fig = self.figure_factory.create_detailed_price_figure(
             df=filtered_data,
             symbol=self.current_symbol,
             period=self.current_period,
             mapped_range=getattr(self, '_mapped_date_range', None),
-            legend_config=plotly_legend_config("<b>Select/deselect indicator by clicking on the text</b>"),
+            legend_config=legend_config,
             margins=standard_margins(120, 160)
         )
         return pn.pane.Plotly(fig, sizing_mode='stretch_both', config={'responsive': True})
@@ -253,7 +258,7 @@ class DetailedPriceDashboard(BaseDashboard):
             margin=(8, 0)
         )
         self.chart_pane = pn.Column(sizing_mode='stretch_width', min_height=1200)
-        self.info_pane = pn.Column(width=280, max_width=280, sizing_mode='fixed', margin=(0, 0), styles={'padding': '12px'})
+        self.info_pane = pn.Column(width=280, max_width=280, sizing_mode='fixed', margin=(0, 0), styles={'padding': '12px', 'background-color': self.config.light_gray_color, 'color': self.config.secondary_text_color})
         self._update_display()
         layout = pn.Column(
             header,
