@@ -21,9 +21,6 @@ class AppConfig:
             "font-size": "18px",
         }
         
-        # Layout settings
-        # self.sidebar_width = 280
-        # self.plot_height = 500
         
         # Cryptocurrency colors for consistency
         self.crypto_colors = {

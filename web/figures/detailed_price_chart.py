@@ -5,7 +5,7 @@ Creates comprehensive price charts with technical indicators and volume.
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import matplotlib.colors as mcolors
+from components.colors import to_rgba
 import pandas as pd
 from typing import Optional, Dict, Tuple, TYPE_CHECKING
 
@@ -116,10 +116,7 @@ def create_detailed_price_figure(
     primary_color = config.get_crypto_color(symbol, 'primary')
     secondary_color = config.get_crypto_color(symbol, 'secondary')
 
-    def to_rgba(color_name, opacity=1.0):
-        """Convert color name to rgba string."""
-        rgba = mcolors.to_rgba(color_name, opacity)
-        return f'rgba({int(rgba[0]*255)}, {int(rgba[1]*255)}, {int(rgba[2]*255)}, {rgba[3]})'
+    # ...removed local to_rgba...
 
     color_a = to_rgba(primary_color, 0.8)
     color_b = to_rgba(secondary_color, 0.6)
@@ -132,9 +129,11 @@ def create_detailed_price_figure(
         subplot_titles=(f'{symbol} Price Chart ({period})', 'Trading Volume')
     )
 
-    # Style subplot titles
-    for annotation in fig.layout.annotations:
-        annotation.update(font=dict(size=18, color='#47356A'), y=annotation.y + 0.03)
+    # Style subplot titles (if any annotations exist)
+    annotations = getattr(fig.layout, 'annotations', None)
+    if annotations:
+        for annotation in annotations:
+            annotation.update(font=dict(size=18, color='#47356A'), y=annotation.y + 0.03)
 
     # Price traces
     fig.add_trace(go.Scatter(

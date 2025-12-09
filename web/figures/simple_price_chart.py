@@ -4,7 +4,7 @@ Creates a basic price chart with fill for a single cryptocurrency.
 """
 
 import plotly.graph_objects as go
-import matplotlib.colors as mcolors
+from components.colors import to_rgba
 import pandas as pd
 from typing import Optional, TYPE_CHECKING
 
@@ -50,10 +50,7 @@ def create_simple_price_chart(
     primary_color = config.get_crypto_color(symbol, 'primary')
     secondary_color = config.get_crypto_color(symbol, 'secondary')
     
-    def convert_color(color_name: str, opacity: float = 0.8) -> str:
-        """Convert a color name to rgba format."""
-        rgba = mcolors.to_rgba(color_name, opacity)
-        return f'rgba({int(rgba[0]*255)}, {int(rgba[1]*255)}, {int(rgba[2]*255)}, {rgba[3]})'
+    # ...removed local convert_color...
     
     # Add price line with fill
     fig.add_trace(go.Scatter(
@@ -61,9 +58,9 @@ def create_simple_price_chart(
         y=df['Close'],
         mode='lines',
         name=f'{symbol} Price',
-        line=dict(color=convert_color(primary_color, 0.8), width=2),
+        line=dict(color=to_rgba(primary_color, 0.8), width=2),
         fill='tozeroy',
-        fillcolor=convert_color(secondary_color, 0.3),
+        fillcolor=to_rgba(secondary_color, 0.3),
         hovertemplate=f'<b>{symbol}</b><br>Date: <b>%{{x}}</b><br>Price: <b>$ %{{y:,.2f}}</b><extra></extra>'
     ))
     
