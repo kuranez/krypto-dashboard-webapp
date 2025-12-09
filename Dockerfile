@@ -17,6 +17,7 @@ RUN groupadd -g 1003 psacln && useradd -u 10000 -g 1003 -m webadmin
 
 # Copy shared components first (imported as `components.*`)
 COPY web/components ./components
+COPY web/figures ./figures
 
 # Copy the main app code and dashboards
 COPY web/app ./app

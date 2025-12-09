@@ -65,4 +65,5 @@ htmlcov/
 # OS
 Thumbs.db
 
-screenshots/Screenshot_20251207_104626.png
+docs/diagrams
+docs/developer-notes.md
