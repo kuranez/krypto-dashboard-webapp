@@ -332,7 +332,7 @@ class SimplePriceDashboard(BaseDashboard):
         
         # Create reactive panes that can be updated
         self.chart_pane = pn.Column(sizing_mode='stretch_both', min_height=500)
-        self.info_pane = pn.Column(width=280, max_width=280, sizing_mode='fixed', styles={'padding': '12px'})
+        self.info_pane = pn.Column(width=280, max_width=280, sizing_mode='fixed', styles={'padding': '12px', 'background-color': self.config.light_gray_color, 'color': self.config.secondary_text_color})
 
         # Initialize with current data
         self._update_display()

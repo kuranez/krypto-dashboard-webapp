@@ -133,7 +133,7 @@ def create_detailed_price_figure(
     annotations = getattr(fig.layout, 'annotations', None)
     if annotations:
         for annotation in annotations:
-            annotation.update(font=dict(size=18, color='#47356A'), y=annotation.y + 0.03)
+            annotation.update(font=dict(size=18, color=config.primary_text_color), y=annotation.y + 0.03)
 
     # Price traces
     fig.add_trace(go.Scatter(
@@ -157,32 +157,32 @@ def create_detailed_price_figure(
     # SMA/EMA indicators
     fig.add_trace(go.Scatter(
         x=df['Date'], y=df['SMA_50'], mode='lines', name='SMA 50',
-        line=dict(color='rgba(231, 76, 60, 0.8)', width=1.5, dash='dash'),
+        line=dict(color=config.red_color, width=1.5, dash='dash'),
         hovertemplate='<b>SMA 50</b>: <b>$%{y:,.2f}</b><extra></extra>'
     ), row=1, col=1)
     
     fig.add_trace(go.Scatter(
         x=df['Date'], y=df['SMA_200'], mode='lines', name='SMA 200',
-        line=dict(color='rgba(155, 89, 182, 0.8)', width=1.5, dash='dash'),
+        line=dict(color=config.blue_color, width=1.5, dash='dash'),
         hovertemplate='<b>SMA 200</b>: <b>$%{y:,.2f}</b><extra></extra>'
     ), row=1, col=1)
     
     fig.add_trace(go.Scatter(
         x=df['Date'], y=df['EMA_50'], mode='lines', name='EMA 50',
-        line=dict(color='rgba(243, 156, 18, 0.8)', width=1.5, dash='dot'),
+        line=dict(color=config.orange_color, width=1.5, dash='dot'),
         hovertemplate='<b>EMA 50</b>: <b>$%{y:,.2f}</b><extra></extra>'
     ), row=1, col=1)
     
     fig.add_trace(go.Scatter(
         x=df['Date'], y=df['EMA_200'], mode='lines', name='EMA 200',
-        line=dict(color='rgba(26, 188, 156, 0.8)', width=1.5, dash='dot'),
+        line=dict(color=config.green_color, width=1.5, dash='dot'),
         hovertemplate='<b>EMA 200</b>: <b>$%{y:,.2f}</b><extra></extra>'
     ), row=1, col=1)
 
     # Volume subplot
     df_volume = _aggregate_volume(df, period, mapped_range)
     colors = [
-        'rgba(26, 188, 156, 0.8)' if close >= open_ else 'rgba(231, 76, 60, 0.8)'
+        config.green_color if close >= open_ else config.red_color
         for close, open_ in zip(df_volume['Close'], df_volume['Open'])
     ]
     

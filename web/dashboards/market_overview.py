@@ -540,8 +540,8 @@ class MarketOverviewDashboard(BaseDashboard):
             """,
             styles={
                 'font-size': '16px',
-                'background-color': '#f8f9fa',
-                'color': '#2c3e50',
+                'background-color': self.config.light_gray_color,
+                'color': self.config.secondary_text_color,
                 'padding': '12px',
                 'border-radius': '5px',
                 'border-left': f'4px solid {self.config.primary_color}',

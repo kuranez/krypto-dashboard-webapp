@@ -38,7 +38,7 @@ def create_volume_only(
     fig = go.Figure(data=[go.Bar(
         x=df['Date'],
         y=df['Volume'],
-        marker_color='#3498db'
+        marker_color=config.blue_color
     )])
     
     fig.update_layout(

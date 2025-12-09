@@ -29,14 +29,10 @@ class DashboardApp(param.Parameterized):
         self.config = AppConfig()
         self.registry = DashboardRegistry()
         self.current_dashboard_instance = None
-        
-        # Discover available dashboards
         self.registry.discover_dashboards()
-        
         # Create UI components
         self._create_main_area()
         self._create_header()
-        
         # Load initial dashboard
         dashboard_names = list(self.registry.get_available_dashboards().keys())
         if dashboard_names:
