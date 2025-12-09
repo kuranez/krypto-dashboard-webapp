@@ -168,12 +168,15 @@ class DetailedPriceDashboard(BaseDashboard):
                 pass
         if filtered_data.empty:
             return pn.pane.Markdown("## No data available\n\nNo data found for the selected time period.")
+        # Use legend border color from config (primary_color = #47356A)
+        legend_config = plotly_legend_config("<b>Select/deselect indicator by clicking on the text</b>")
+        legend_config['bordercolor'] = self.config.primary_color
         fig = self.figure_factory.create_detailed_price_figure(
             df=filtered_data,
             symbol=self.current_symbol,
             period=self.current_period,
             mapped_range=getattr(self, '_mapped_date_range', None),
-            legend_config=plotly_legend_config("<b>Select/deselect indicator by clicking on the text</b>"),
+            legend_config=legend_config,
             margins=standard_margins(120, 160)
         )
         return pn.pane.Plotly(fig, sizing_mode='stretch_both', config={'responsive': True})
