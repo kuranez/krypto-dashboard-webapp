@@ -145,21 +145,39 @@ class FigureFactory:
             df['EMA_200'] = df['Close'].ewm(span=200, adjust=False).mean()
         return df
 
-    def _aggregate_volume(self, df: pd.DataFrame, period: str) -> pd.DataFrame:
-        """Aggregate volume by day/week/month depending on selected period."""
+    def _get_resample_period(self, period: str, date_range: Optional[Tuple[pd.Timestamp, pd.Timestamp]] = None) -> str:
+        """Determine the appropriate resampling period (Day, Week, Month) based on the selected time period or date range."""
+        if date_range:
+            days = (date_range[1] - date_range[0]).days
+            if days <= 90: # Up to ~3 months
+                return 'D'
+            elif days <= 730: # Up to 2 years
+                return 'W'
+            else:
+                return 'M'
+
         if period in ['2Y', '3Y', '5Y', 'All_Time']:
-            df_copy = df.copy()
-            df_copy['Month'] = df_copy['Date'].dt.to_period('M').apply(lambda r: r.start_time)
-            df_volume = df_copy.groupby('Month').agg({'Volume': 'sum', 'Close': 'last', 'Open': 'first'}).reset_index()
-            df_volume.rename(columns={'Month': 'Date'}, inplace=True)
+            return 'M'  # Month
         elif period in ['3M', '6M', '1Y']:
-            df_copy = df.copy()
-            df_copy['Week'] = df_copy['Date'].dt.to_period('W').apply(lambda r: r.start_time)
-            df_volume = df_copy.groupby('Week').agg({'Volume': 'sum', 'Close': 'last', 'Open': 'first'}).reset_index()
-            df_volume.rename(columns={'Week': 'Date'}, inplace=True)
+            return 'W'  # Week
         else:
-            df_volume = df.groupby('Date').agg({'Volume': 'sum', 'Close': 'last', 'Open': 'first'}).reset_index()
-        return df_volume
+            return 'D'  # Day
+
+    def _aggregate_volume(self, df: pd.DataFrame, period: str, date_range: Optional[Tuple[pd.Timestamp, pd.Timestamp]] = None) -> pd.DataFrame:
+        """Aggregate volume by day/week/month depending on selected period."""
+        resample_period = self._get_resample_period(period, date_range)
+        
+        # Set 'Date' as the index for resampling
+        df_resample = df.set_index('Date')
+        
+        # Resample the data
+        df_agg = df_resample.resample(resample_period).agg({
+            'Volume': 'sum',
+            'Close': 'last',
+            'Open': 'first'
+        }).dropna().reset_index()
+        
+        return df_agg
 
     def create_detailed_price_figure(
         self,
@@ -229,7 +247,7 @@ class FigureFactory:
                                  hovertemplate='<b>EMA 200</b>: <b>$%{y:,.2f}</b><extra></extra>'), row=1, col=1)
 
         # Volume
-        df_volume = self._aggregate_volume(df, period)
+        df_volume = self._aggregate_volume(df, period, mapped_range)
         colors = ['rgba(26, 188, 156, 0.8)' if close >= open_ else 'rgba(231, 76, 60, 0.8)'
                   for close, open_ in zip(df_volume['Close'], df_volume['Open'])]
         fig.add_trace(go.Bar(x=df_volume['Date'], y=df_volume['Volume'], name='Volume',
@@ -253,6 +271,17 @@ class FigureFactory:
 
         if mapped_range:
             fig.update_xaxes(range=mapped_range)
+            
+            # Autoscale volume y-axis based on the visible date range
+            try:
+                start_date, end_date = pd.to_datetime(mapped_range[0]), pd.to_datetime(mapped_range[1])
+                visible_volume_df = df_volume[(df_volume['Date'] >= start_date) & (df_volume['Date'] <= end_date)]
+                if not visible_volume_df.empty:
+                    max_volume = visible_volume_df['Volume'].max()
+                    fig.update_yaxes(row=2, col=1, range=[0, max_volume * 1.15]) # Add 15% padding
+            except Exception:
+                # Fallback to default autoscaling if range parsing fails
+                pass
 
         fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128, 128, 128, 0.2)')
         fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(128, 128, 128, 0.2)')
