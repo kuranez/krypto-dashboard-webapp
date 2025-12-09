@@ -83,12 +83,20 @@ Based on previous project: https://github.com/kuranez/krypto-dashboard
 
 ### Core Components
 
-- **`main.py`**: Application entry point and layout management
-- **`dashboard_registry.py`**: Auto-discovery and loading of dashboard modules
-- **`base_dashboard.py`**: Abstract base class for all dashboards
-- **`data_manager.py`**: Centralized data fetching and caching
-- **`figure_factory.py`**: Standardized chart creation utilities
-- **`config.py`**: Application-wide configuration and styling
+- **`main.py`**: Application entry point and layout management.
+- **`dashboard_registry.py`**: Auto-discovery and loading of dashboard modules.
+- **`base_dashboard.py`**: Abstract base class for all dashboards.
+- **`data_manager.py`**: Centralized data fetching and caching.
+- **`figure_factory.py`**: Standardized chart creation utilities.
+- **`config.py`**: Application-wide configuration and styling.
+
+### Shared Components
+
+- **`components/colors.py`**: Helper functions for color management like conversion. Configuration in `config.py`.
+- **`components/explanations.py`**: Informational texts and dashboard descriptions.
+- **`components/layouts.py`**: Shared layout templates for consistent dashboard structure.
+- **`components/ui.py`**: Common UI elements such panels.
+- **`components/widgets.py`**: Reusable widgets for user interaction.
 
 ### Dashboard Structure
 
@@ -98,40 +106,30 @@ web/
 │   ├── main.py                    # Main application
 │   ├── launch.py                  # Local development launcher
 │   ├── dashboard_registry.py      # Dashboard discovery
-│   ├── base_dashboard.py          # Base dashboard class
-│   ├── data_manager.py            # Data management
-│   ├── figure_factory.py          # Chart creation
-│   ├── config.py                  # Configuration
-│   └── requirements.txt           # Dependencies
-│
+│   ├── base_dashboard.py         # Base dashboard class
+│   ├── data_manager.py           # Data management
+│   ├── figure_factory.py         # Chart creation
+│   ├── config.py                 # Configuration
+│   └── requirements.txt          # Dependencies
+│ 
 ├── dashboards/
-│   ├── simple_price_dashboard.py  # Basic price chart
-│   ├── detailed_price_chart.py    # Detailed analysis
-│   └── market_overview.py         # Market overview
-│
+│   ├── simple_price_dashboard.py # Basic price chart
+│   ├── detailed_price_chart.py   # Detailed analysis
+│   └── market_overview.py        # Market overview
+│ 
 ├── components/
-│   ├── colors.py                  # Helper functions for color management
-│   ├── explanations.py            # Dashboard info texts
-│   ├── layouts.py                 # Shared layout elements
-│   ├── ui.py                      # Shared UI elements
-│   └── widgets.py                 # Shared widgets
-│
+│   ├── explanations.py           # Dashboard info texts
+│   ├── layouts.py                # Shared layout elements
+│   ├── ui.py                     # Shared ui elements
+│   └── widgets.py                # Shared widgets
+│ 
 ├── assets/
-│   └── logo.png                   # Application logo
-│
-└── testing/
-    ├── conftest.py                # Pytest configuration file
-    └── test_correlation.py        # Test correlation calculations
+│  └── logo.png                   # Application logo
+│ 
+└──testing/
+    ├── conftest.py               # Pytest configuration file
+    └── test_correlation.py       # Test correlation calculations 
 ```
-
-### Shared Components
-
-- **`colors.py`**: Utility functions for managing and applying consistent color schemes across dashboards.
-- **`explanations.py`**: Contains reusable informational texts and descriptions for dashboards and UI elements.
-- **`layouts.py`**: Defines shared layout structures and reusable layout elements for consistent app design.
-- **`ui.py`**: Provides common user interface components such as headers and info boxes.
-- **`widgets.py`**: Shared interactive widgets (dropdowns, sliders, selectors) used throughout dashboards.
-
 
 ## 💡 Creating New Dashboards
 

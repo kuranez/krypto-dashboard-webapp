@@ -65,6 +65,12 @@ htmlcov/
 # OS
 Thumbs.db
 
+<<<<<<< HEAD
 docs/diagrams
 docs/developer-notes.md
 web/figures/README.md
+=======
+screenshots/Screenshot_20251207_104626.png
+docs/developer-notes.md
+docs/diagrams
+>>>>>>> b468c64 (Updated docs.)
