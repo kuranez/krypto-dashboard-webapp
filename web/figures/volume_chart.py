@@ -35,12 +35,22 @@ def create_volume_only(
         from app.config import AppConfig
         config = AppConfig()
     
+    # Use red/green colors for volume bars based on price movement if 'Open' and 'Close' columns are present.
+    if 'Open' in df.columns and 'Close' in df.columns:
+        bar_colors = [
+            config.green_color if close >= open_ else config.red_color
+            for open_, close in zip(df['Open'], df['Close'])
+        ]
+    else:
+        # Default to blue if price columns are missing
+        bar_colors = [config.blue_color] * len(df)
+
     fig = go.Figure(data=[go.Bar(
         x=df['Date'],
         y=df['Volume'],
-        marker_color=config.blue_color
+        marker_color=bar_colors
     )])
-    
+
     fig.update_layout(
         title=title or "Trading Volume",
         title_font_size=18,
@@ -51,8 +61,8 @@ def create_volume_only(
         autosize=True,
         margin=margins or dict(l=50, r=50, t=50, b=50)
     )
-    
+
     if x_range:
         fig.update_xaxes(range=x_range)
-    
+
     return fig

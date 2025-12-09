@@ -12,8 +12,7 @@ def create_header(title: str, color: str) -> pn.pane.Markdown:
     )
 
 
-def create_summary_box(text: str, border_color: str) -> pn.pane.Markdown:
-    config = AppConfig()
+def create_summary_box(text: str, border_color: str, config: AppConfig) -> pn.pane.Markdown:
     return pn.pane.Markdown(
         text,
         styles={

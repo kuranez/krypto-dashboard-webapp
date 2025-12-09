@@ -1,8 +1,10 @@
 from config import AppConfig
 from typing import Dict
-
-def plotly_legend_config(title_text: str = "") -> Dict:
-    config = AppConfig()
+from components.colors import to_rgba
+def plotly_legend_config(title_text: str = "", config: AppConfig = None) -> Dict:
+    if config is None:
+        config = AppConfig()
+    
     return dict(
         orientation="h",
         yanchor="top",
@@ -10,7 +12,7 @@ def plotly_legend_config(title_text: str = "") -> Dict:
         xanchor="center",
         x=0.5,
         bgcolor=config.white_color,
-        bordercolor=config.primary_color + '4D',  # 0.3 alpha as hex (4D)
+        bordercolor=to_rgba(config.primary_color, 0.3),  # 0.3 alpha
         borderwidth=1,
         font=dict(size=18),
         title=dict(

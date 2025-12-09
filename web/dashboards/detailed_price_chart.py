@@ -49,7 +49,7 @@ class DetailedPriceDashboard(BaseDashboard):
     def _create_widgets(self):
         self.widgets['symbol_selector'] = create_symbol_selector(self.available_symbols, self.current_symbol)
         self.widgets['period_selector'] = create_period_selector(self.available_periods, self.current_period)
-        self.widgets['range_idx'], self.widgets['range_label'] = create_range_widgets()
+        self.widgets['range_idx'], self.widgets['range_label'] = create_range_widgets(self.config)
         # Bind
         self.widgets['symbol_selector'].param.watch(self._on_symbol_change, 'value')
         self.widgets['period_selector'].param.watch(self._on_period_change, 'value')
@@ -168,7 +168,7 @@ class DetailedPriceDashboard(BaseDashboard):
                 pass
         if filtered_data.empty:
             return pn.pane.Markdown("## No data available\n\nNo data found for the selected time period.")
-        # Use legend border color from config (primary_color = #47356A)
+        # Use legend border color from config
         legend_config = plotly_legend_config("<b>Select/deselect indicator by clicking on the text</b>")
         legend_config['bordercolor'] = self.config.primary_color
         fig = self.figure_factory.create_detailed_price_figure(
@@ -248,7 +248,8 @@ class DetailedPriceDashboard(BaseDashboard):
             <br>
             *See bottom of page for detailed indicator explanations.*
             """,
-            self.config.primary_color
+            self.config.primary_color,
+            self.config
         )
         explanation = technical_analysis_guide()
         controls = pn.Column(
