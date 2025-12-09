@@ -133,7 +133,7 @@ def create_detailed_price_figure(
     annotations = getattr(fig.layout, 'annotations', None)
     if annotations:
         for annotation in annotations:
-            annotation.update(font=dict(size=18, color=config.primary_text_color), y=annotation.y + 0.03)
+            annotation.update(font=dict(size=18, color=config.primary_text_color), y=annotation.y + 0.04)
 
     # Price traces
     fig.add_trace(go.Scatter(

@@ -60,7 +60,7 @@ class SimplePriceDashboard(BaseDashboard):
         # )
         
         # Index-based range slider for consistent precision
-        self.widgets['range_idx'], self.widgets['range_label'] = create_range_widgets()
+        self.widgets['range_idx'], self.widgets['range_label'] = create_range_widgets(self.config)
         
         # Bind events
         self.widgets['symbol_selector'].param.watch(self._on_symbol_change, 'value')
@@ -312,7 +312,8 @@ class SimplePriceDashboard(BaseDashboard):
             Track individual cryptocurrency price movements over time.
             Select your preferred cryptocurrency and time period to view historical price trends.
             """,
-            self.config.primary_color
+            self.config.primary_color,
+            self.config
         )
         
         # Controls: first row (selectors + range label), second row (slider)
