@@ -3,9 +3,10 @@ Base Dashboard Class
 Abstract base class for all dashboard implementations.
 """
 
-import panel as pn
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List
+
+import panel as pn
 
 class BaseDashboard(ABC):
     """Abstract base class for dashboard implementations."""

@@ -1,5 +1,5 @@
 import panel as pn
-
+from config import AppConfig
 
 def create_header(title: str, color: str) -> pn.pane.Markdown:
     return pn.pane.Markdown(
@@ -13,12 +13,13 @@ def create_header(title: str, color: str) -> pn.pane.Markdown:
 
 
 def create_summary_box(text: str, border_color: str) -> pn.pane.Markdown:
+    config = AppConfig()
     return pn.pane.Markdown(
         text,
         styles={
             'font-size': '16px',
-            'background-color': '#f8f9fa',
-            'color': '#2c3e50',
+            'background-color': config.light_gray_color,
+            'color': config.secondary_text_color,
             'padding': '12px',
             'border-radius': '5px',
             'border-left': f'4px solid {border_color}',

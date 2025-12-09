@@ -4,18 +4,17 @@ Centralized figure creation and styling utilities.
 This factory delegates to specialized figure modules for better code organization.
 """
 
-import matplotlib.colors as mcolors
 import pandas as pd
-from typing import Dict, Optional, Tuple
 import plotly.graph_objects as go
-from config import AppConfig
+from typing import Dict, Optional, Tuple
 
-# Import specialized figure creation functions
+from components.colors import to_rgba
+from config import AppConfig
 from figures import (
     create_simple_price_chart as _create_simple_price_chart,
     create_candlestick as _create_candlestick,
     create_volume_only as _create_volume_only,
-    create_detailed_price_figure as _create_detailed_price_figure
+    create_detailed_price_figure as _create_detailed_price_figure,
 )
 
 
@@ -26,9 +25,8 @@ class FigureFactory:
         self.config = AppConfig()
     
     def convert_color(self, color_name: str, opacity: float = 0.8) -> str:
-        """Convert a color name to rgba format."""
-        rgba = mcolors.to_rgba(color_name, opacity)
-        return f'rgba({int(rgba[0]*255)}, {int(rgba[1]*255)}, {int(rgba[2]*255)}, {rgba[3]})'
+        """Convert a color name to rgba format using shared utility."""
+        return to_rgba(color_name, opacity)
     
     def create_simple_price_chart(self, 
                                   df: pd.DataFrame, 

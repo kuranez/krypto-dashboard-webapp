@@ -3,10 +3,12 @@ Simple Price Chart
 Creates a basic price chart with fill for a single cryptocurrency.
 """
 
-import plotly.graph_objects as go
-from components.colors import to_rgba
-import pandas as pd
 from typing import Optional, TYPE_CHECKING
+
+import pandas as pd
+import plotly.graph_objects as go
+
+from components.colors import to_rgba
 
 if TYPE_CHECKING:
     from app.config import AppConfig

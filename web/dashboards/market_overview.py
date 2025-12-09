@@ -3,22 +3,23 @@ Market Overview Dashboard
 Shows current price vs all-time high and price comparison for multiple cryptocurrencies.
 """
 
+from components.colors import to_rgba
+import pandas as pd
 import panel as pn
 import plotly.graph_objects as go
-import matplotlib.colors as mcolors
-import pandas as pd
+
 from base_dashboard import BaseDashboard
-from data_manager import DataManager
-from config import AppConfig
 from components.explanations import market_coupling_explanation
 from components.layouts import plotly_legend_config, standard_margins
+from config import AppConfig
+from data_manager import DataManager
 
 class MarketOverviewDashboard(BaseDashboard):
     """Market overview dashboard for multiple cryptocurrencies."""
     
     display_name = "Market Overview"
     description = "Market overview with current vs ATH and price comparison"
-    version = "2.5"
+    version = "2.6"
     author = "kuranez"
     
     def __init__(self):
@@ -151,9 +152,8 @@ class MarketOverviewDashboard(BaseDashboard):
             print(f"Error loading data: {e}")
     
     def _convert_color(self, color_name, opacity=1.0):
-        """Convert a color name to rgba format."""
-        rgba = mcolors.to_rgba(color_name, opacity)
-        return f'rgba({int(rgba[0]*255)}, {int(rgba[1]*255)}, {int(rgba[2]*255)}, {rgba[3]})'
+        """Convert a color name to rgba format using shared utility."""
+        return to_rgba(color_name, opacity)
     
     def _create_combined_plot(self):
         """Create combined plot with price comparison, current vs ATH, and rolling correlation."""
@@ -474,7 +474,7 @@ class MarketOverviewDashboard(BaseDashboard):
         # Style the subplot titles (first 3 annotations) and move them up
         for i in range(min(3, len(current_annotations))):
             current_annotations[i].update(
-                font=dict(size=18, color='#47356A', family='Arial, sans-serif'),
+                font=dict(size=18, color=self.config.primary_text_color, family='Arial, sans-serif'),
                 y=current_annotations[i].y + 0.04  # Move titles up
             )
         
